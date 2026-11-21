@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Ảo Vật Lí THPT - Kết Nối Tri Thức</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        .font-mono-tech {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            background: #cbd5e1;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Thanh điều hướng trên cùng -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-lg shadow-inner">⚛️</div>
+                    <div>
+                        <h1 class="text-base sm:text-lg font-extrabold tracking-tight leading-tight">PHÒNG THÍ NGHIỆM ẢO VẬT LÍ THPT</h1>
+                        <p class="text-[11px] text-slate-400">Chương trình GDPT 2018 • Bộ sách Kết nối tri thức với cuộc sống</p>
+                    </div>
+                </div>
+                <div id="toast-box" class="hidden px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold shadow-md transition">
+                    Đã lưu số liệu!
+                </div>
+            </div>
+
+            <!-- Danh sách 8 phân khu thí nghiệm -->
+            <nav class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                <button onclick="switchLab('speed')" id="tab-speed" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow transition">
+                    1. Đo tốc độ (Bài 6)
+                </button>
+                <button onclick="switchLab('projectile')" id="tab-projectile" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                    2. Rơi tự do & Ném (Bài 10, 12)
+                </button>
+                <button onclick="switchLab('forces')" id="tab-forces" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                    3. Tổng hợp & Phân tích lực
+                </button>
+                <button onclick="switchLab('newton')" id="tab-newton" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                    4. Ba Định luật Newton
+                </button>
+                <button onclick="switchLab('moment')" id="tab-moment" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                    5. Moment lực (Bài 21)
+                </button>
+                <button onclick="switchLab('momentum')" id="tab-momentum" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                    6. Động lượng & Va chạm
+                </button>
+                <button onclick="switchLab('circular_hooke')" id="tab-circular_hooke" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                    7. Tròn đều & ĐL Hooke
+                </button>
+                <button onclick="switchLab('pendulum_circuit')" id="tab-pendulum_circuit" class="lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                    8. Con lắc & Mạch điện (VL11)
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Khu vực nội dung chính -->
+    <main class="max-w-7xl w-full mx-auto px-4 py-4 flex-1 flex flex-col gap-4">
+
+        <!-- Thanh tiêu đề bài thí nghiệm & Bộ điều khiển thời gian -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+                <span id="lab-grade-badge" class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-1">
+                    Vật lí 10 • Bài 6: Thực hành đo tốc độ của vật chuyển động (KNTT)
+                </span>
+                <h2 id="lab-title" class="text-lg sm:text-xl font-extrabold text-slate-900">
+                    Thí nghiệm 1: Đo tốc độ trung bình và tốc độ tức thời bằng cổng quang điện
+                </h2>
+                <p id="lab-desc" class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                    Thả viên bi thép lăn trên máng nghiêng qua hai cổng quang điện A và B nối với đồng hồ đo thời gian hiện số.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <div class="bg-slate-900 text-emerald-400 px-3.5 py-2 rounded-xl font-mono-tech text-base font-bold border border-slate-700 shadow-inner flex items-center gap-2">
+                    <span class="text-[11px] text-slate-400 font-sans uppercase">Thời gian:</span>
+                    <span id="digital-timer">0.00 s</span>
+                </div>
+                <button id="btn-play-pause" onclick="toggleSimulation()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow transition flex items-center gap-1.5">
+                    <span>▶</span> <span>Chạy</span>
+                </button>
+                <button onclick="resetSimulation()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold border border-slate-300 transition">
+                    ↺ Đặt lại
+                </button>
+                <button onclick="recordData()" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow transition">
+                    + Ghi số liệu
+                </button>
+            </div>
+        </section>
+
+        <!-- Lưới làm việc chính: Cột trái (Thông số) + Cột phải (Mô phỏng & Đồ thị) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+            <!-- Bảng điều khiển thông số bên trái -->
+            <aside class="lg:col-span-4 bg-white rounded-2xl p-4 shadow-sm border border-slate-200 h-fit">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-3 pb-2 border-b border-slate-100">
+                    Bảng điều khiển thông số thí nghiệm
+                </h3>
+
+                <!-- 1. Điều khiển Đo tốc độ (Bài 6) -->
+                <div id="controls-speed" class="space-y-3.5">
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-slate-700">Góc nghiêng máng trượt (α)</span>
+                            <span id="val-spd-angle" class="font-mono-tech font-bold text-blue-600">15°</span>
+                        </div>
+                        <input type="range" id="inp-spd-angle" min="5" max="35" step="1" value="15" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-slate-700">Vị trí cổng quang A (x_A)</span>
+                            <span id="val-spd-xa" class="font-mono-tech font-bold text-blue-600">0.20 m</span>
+                        </div>
+                        <input type="range" id="inp-spd-xa" min="0.10" max="0.45" step="0.05" value="0.20" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-slate-700">Vị trí cổng quang B (x_B)</span>
+                            <span id="val-spd-xb" class="font-mono-tech font-bold text-blue-600">0.80 m</span>
+                        </div>
+                        <input type="range" id="inp-spd-xb" min="0.55" max="1.10" step="0.05" value="0.80" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-slate-700">Đường kính bi / tấm chắn (d)</span>
+                            <span id="val-spd-d" class="font-mono-tech font-bold text-blue-600">0.020 m</span>
+                        </div>
+                        <input type="range" id="inp-spd-d" min="0.010" max="0.050" step="0.005" value="0.020" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-slate-700">Hệ số ma sát lăn (μ)</span>
+                            <span id="val-spd-mu" class="font-mono-tech font-bold text-blue-600">0.02</span>
+                        </div>
+                        <input type="range" id="inp-spd-mu" min="0.00" max="0.15" step="0.01" value="0.02" oninput="updateParams()">
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1.5 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Thời gian chắn cổng A (Δt_A):</span>
+                            <span id="disp-spd-ta" class="font-mono-tech font-bold text-amber-400">0.000 s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Thời gian chắn cổng B (Δt_B):</span>
+                            <span id="disp-spd-tb" class="font-mono-tech font-bold text-amber-400">0.000 s</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Thời gian đi từ A → B (t_AB):</span>
+                            <span id="disp-spd-tab" class="font-mono-tech font-bold text-cyan-400">0.000 s</span>
+                        </div>
+                        <div class="flex justify-between border-t border-slate-700 pt-1.5">
+                            <span class="text-slate-300">Tốc độ tức thời tại B (v_B = d/Δt_B):</span>
+                            <span id="disp-spd-vb" class="font-mono-tech font-bold text-emerald-400">0.00 m/s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Điều khiển Rơi tự do & Ném ngang & Ném xiên (Bài 10 & 12) -->
+                <div id="controls-projectile" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="setProjMode('newton_tube')" id="btn-pmode-newton" class="py-2 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition">
+                            1. Ống Newton (Rơi tự do)
+                        </button>
+                        <button onclick="setProjMode('throw')" id="btn-pmode-throw" class="py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+                            2. Ném ngang & Ném xiên
+                        </button>
+                    </div>
+
+                    <!-- Chế độ 2.1: Thí nghiệm ống chân không của Newton (Bài 10) -->
+                    <div id="subctrl-proj-newton" class="space-y-3.5">
+                        <div class="flex items-center justify-between bg-slate-100 p-2.5 rounded-xl">
+                            <span class="text-sm font-bold text-slate-700">Môi trường trong ống</span>
+                            <button id="btn-vacuum-toggle" onclick="toggleVacuumTube()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow transition">
+                                CHÂN KHÔNG (Hút hết khí)
+                            </button>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Chiều cao ống Newton (h)</span>
+                                <span id="val-ntube-h" class="font-mono-tech font-bold text-blue-600">2.0 m</span>
+                            </div>
+                            <input type="range" id="inp-ntube-h" min="1.0" max="5.0" step="0.5" value="2.0" oninput="updateParams()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Gia tốc trọng trường (g)</span>
+                                <span id="val-ntube-g" class="font-mono-tech font-bold text-blue-600">9.8 m/s²</span>
+                            </div>
+                            <input type="range" id="inp-ntube-g" min="1.6" max="20" step="0.1" value="9.8" oninput="updateParams()">
+                            <div class="flex gap-1.5 mt-1.5">
+                                <button onclick="setG('ntube', 9.8)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Trái Đất (9.8)</button>
+                                <button onclick="setG('ntube', 1.6)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Mặt Trăng (1.6)</button>
+                                <button onclick="setG('ntube', 3.7)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Sao Hỏa (3.7)</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1.5 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Thời gian rơi viên bi chì (t_bi):</span>
+                                <span id="disp-ntube-tball" class="font-mono-tech font-bold text-cyan-400">0.00 s</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Thời gian rơi lông chim (t_lông):</span>
+                                <span id="disp-ntube-tfeather" class="font-mono-tech font-bold text-amber-400">0.00 s</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Thời gian rơi lí thuyết √(2h/g):</span>
+                                <span id="disp-ntube-ttheo" class="font-mono-tech font-bold text-emerald-400">0.64 s</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 text-xs text-slate-700 space-y-1">
+                            <div class="font-semibold text-blue-800">Bài 10: Thí nghiệm ống Newton (KNTT):</div>
+                            <p>Khi hút hết không khí (chân không), viên bi chì và chiếc lông chim rơi nhanh như nhau và chạm đáy ống cùng một lúc!</p>
+                        </div>
+                    </div>
+
+                    <!-- Chế độ 2.2: Chuyển động ném ngang & ném xiên (Bài 12) -->
+                    <div id="subctrl-proj-throw" class="space-y-3.5 hidden">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Độ cao ban đầu (h)</span>
+                                <span id="val-proj-h" class="font-mono-tech font-bold text-blue-600">40 m</span>
+                            </div>
+                            <input type="range" id="inp-proj-h" min="0" max="80" step="1" value="40" oninput="updateParams()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Vận tốc ban đầu (v₀)</span>
+                                <span id="val-proj-v0" class="font-mono-tech font-bold text-blue-600">15 m/s</span>
+                            </div>
+                            <input type="range" id="inp-proj-v0" min="0" max="35" step="1" value="15" oninput="updateParams()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Góc ném so với phương ngang (α)</span>
+                                <span id="val-proj-angle" class="font-mono-tech font-bold text-blue-600">0°</span>
+                            </div>
+                            <input type="range" id="inp-proj-angle" min="0" max="75" step="5" value="0" oninput="updateParams()">
+                            <p class="text-[11px] text-slate-400 mt-0.5">* α = 0°: Ném ngang; α &gt; 0°: Ném xiên (Bài 12).</p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Gia tốc trọng trường (g)</span>
+                                <span id="val-proj-g" class="font-mono-tech font-bold text-blue-600">9.8 m/s²</span>
+                            </div>
+                            <input type="range" id="inp-proj-g" min="1.6" max="20" step="0.1" value="9.8" oninput="updateParams()">
+                            <div class="flex gap-1.5 mt-1.5">
+                                <button onclick="setG('proj', 9.8)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Trái Đất (9.8)</button>
+                                <button onclick="setG('proj', 1.6)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Mặt Trăng (1.6)</button>
+                                <button onclick="setG('proj', 3.7)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600">Sao Hỏa (3.7)</button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-slate-100 space-y-2.5">
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-sm font-medium text-slate-700">Lực cản không khí (F_c)</span>
+                                <input type="checkbox" id="inp-proj-drag" onchange="updateParams()" class="w-4 h-4 accent-blue-600 rounded">
+                            </label>
+                            <div id="proj-drag-coeff-box" class="hidden pl-2 border-l-2 border-blue-200">
+                                <div class="flex justify-between text-xs font-medium mb-1">
+                                    <span class="text-slate-600">Hệ số cản môi trường (k)</span>
+                                    <span id="val-proj-k" class="font-mono-tech font-bold text-blue-600">0.035</span>
+                                </div>
+                                <input type="range" id="inp-proj-k" min="0.005" max="0.15" step="0.005" value="0.035" oninput="updateParams()">
+                            </div>
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-sm font-medium text-slate-700">Hiển thị vectơ vận tốc (v, vₓ, vᵧ)</span>
+                                <input type="checkbox" id="inp-proj-vectors" checked onchange="drawSim()" class="w-4 h-4 accent-blue-600 rounded">
+                            </label>
+                        </div>
+
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1.5 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Độ cao cực đại (H_max):</span>
+                                <span id="disp-proj-hmax" class="font-mono-tech font-bold text-amber-400">40.00 m</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Tầm xa lí thuyết (L):</span>
+                                <span id="disp-proj-range" class="font-mono-tech font-bold text-cyan-400">42.86 m</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 text-xs text-slate-700 space-y-1">
+                            <div class="font-semibold text-blue-800">Bài 12: Chuyển động ném (Vật lí 10 - KNTT):</div>
+                            <div>• Ném xiên: <span class="font-mono-tech">H_max = h + (v₀·sinα)² / (2g)</span></div>
+                            <div>• Tầm xa (h=0): <span class="font-mono-tech">L = (v₀²·sin2α) / g</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Điều khiển Tổng hợp & Phân tích lực -->
+                <div id="controls-forces" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="setForceMode('compose')" id="btn-fmode-compose" class="py-2 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition">
+                            1. Tổng hợp lực đồng quy
+                        </button>
+                        <button onclick="setForceMode('decompose')" id="btn-fmode-decompose" class="py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+                            2. Phân tích lực mp nghiêng
+                        </button>
+                    </div>
+
+                    <div id="subctrl-force-compose" class="space-y-3.5">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-blue-600 font-semibold">Độ lớn lực F₁</span>
+                                <span id="val-f1" class="font-mono-tech font-bold text-blue-600">40 N</span>
+                            </div>
+                            <input type="range" id="inp-f1" min="10" max="80" step="2" value="40" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-emerald-600 font-semibold">Độ lớn lực F₂</span>
+                                <span id="val-f2" class="font-mono-tech font-bold text-emerald-600">30 N</span>
+                            </div>
+                            <input type="range" id="inp-f2" min="10" max="80" step="2" value="30" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Góc xen giữa α = (F₁, F₂)</span>
+                                <span id="val-falpha" class="font-mono-tech font-bold text-slate-800">60°</span>
+                            </div>
+                            <input type="range" id="inp-falpha" min="0" max="180" step="5" value="60" oninput="updateParams()">
+                        </div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1.5 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Hợp lực F = √(F₁² + F₂² + 2F₁F₂cosα):</span>
+                                <span id="disp-fsum" class="font-mono-tech font-bold text-rose-400">60.83 N</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Góc hợp lực với F₁ (θ):</span>
+                                <span id="disp-ftheta" class="font-mono-tech font-bold text-amber-400">25.3°</span>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-slate-500 italic">* Mẹo: Bạn có thể kéo thả trực tiếp đầu mũi tên F₁, F₂ ngay trên khung mô phỏng!</p>
+                    </div>
+
+                    <div id="subctrl-force-decompose" class="space-y-3.5 hidden">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Góc nghiêng mặt phẳng (α)</span>
+                                <span id="val-inc-alpha" class="font-mono-tech font-bold text-blue-600">30°</span>
+                            </div>
+                            <input type="range" id="inp-inc-alpha" min="5" max="60" step="1" value="30" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Khối lượng vật (m)</span>
+                                <span id="val-inc-m" class="font-mono-tech font-bold text-blue-600">2.0 kg</span>
+                            </div>
+                            <input type="range" id="inp-inc-m" min="0.5" max="10.0" step="0.5" value="2.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Hệ số ma sát trượt (μ)</span>
+                                <span id="val-inc-mu" class="font-mono-tech font-bold text-blue-600">0.20</span>
+                            </div>
+                            <input type="range" id="inp-inc-mu" min="0.00" max="0.80" step="0.05" value="0.20" oninput="updateParams()">
+                        </div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-400">Trọng lực P = mg:</span><span id="disp-inc-p" class="font-mono-tech font-bold text-amber-400">19.60 N</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Thành phần Pₓ = P·sinα:</span><span id="disp-inc-px" class="font-mono-tech font-bold text-rose-400">9.80 N</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Áp lực N = Pᵧ = P·cosα:</span><span id="disp-inc-py" class="font-mono-tech font-bold text-cyan-400">16.97 N</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Gia tốc trượt (a):</span><span id="disp-inc-a" class="font-mono-tech font-bold text-emerald-400">3.20 m/s²</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Điều khiển Ba Định luật Newton -->
+                <div id="controls-newton" class="space-y-4 hidden">
+                    <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="setNewtonLaw(1)" id="btn-nlaw-1" class="py-1.5 px-1 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition">ĐL I</button>
+                        <button onclick="setNewtonLaw(2)" id="btn-nlaw-2" class="py-1.5 px-1 rounded-lg text-xs font-bold text-slate-600 transition">ĐL II</button>
+                        <button onclick="setNewtonLaw(3)" id="btn-nlaw-3" class="py-1.5 px-1 rounded-lg text-xs font-bold text-slate-600 transition">ĐL III</button>
+                    </div>
+
+                    <div id="subctrl-newton-1" class="space-y-3.5">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Vận tốc ban đầu của xe (v₀)</span>
+                                <span id="val-n1-v0" class="font-mono-tech font-bold text-blue-600">6.0 m/s</span>
+                            </div>
+                            <input type="range" id="inp-n1-v0" min="2" max="12" step="0.5" value="6.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Ma sát giữa khối hàng & sàn xe (μ)</span>
+                                <span id="val-n1-mu" class="font-mono-tech font-bold text-blue-600">0.05</span>
+                            </div>
+                            <input type="range" id="inp-n1-mu" min="0.00" max="0.50" step="0.05" value="0.05" oninput="updateParams()">
+                        </div>
+                        <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 text-xs text-slate-700">
+                            <b>Định luật I Newton (Quán tính):</b> Khi xe va vào vật cản và dừng lại đột ngột, khối hàng bên trên có xu hướng bảo toàn vận tốc cũ nên tiếp tục lao về phía trước.
+                        </div>
+                    </div>
+
+                    <div id="subctrl-newton-2" class="space-y-3.5 hidden">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Lực kéo quả nặng (F)</span>
+                                <span id="val-n2-f" class="font-mono-tech font-bold text-blue-600">4.0 N</span>
+                            </div>
+                            <input type="range" id="inp-n2-f" min="1.0" max="15.0" step="0.5" value="4.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Khối lượng xe lăn (m)</span>
+                                <span id="val-n2-m" class="font-mono-tech font-bold text-blue-600">2.0 kg</span>
+                            </div>
+                            <input type="range" id="inp-n2-m" min="0.5" max="8.0" step="0.5" value="2.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Hệ số ma sát mặt bàn (μ)</span>
+                                <span id="val-n2-mu" class="font-mono-tech font-bold text-blue-600">0.00</span>
+                            </div>
+                            <input type="range" id="inp-n2-mu" min="0.00" max="0.30" step="0.02" value="0.00" oninput="updateParams()">
+                        </div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 text-xs flex justify-between">
+                            <span class="text-slate-400">Gia tốc thu được a = (F - F_ms)/m:</span>
+                            <span id="disp-n2-a" class="font-mono-tech font-bold text-emerald-400">2.00 m/s²</span>
+                        </div>
+                    </div>
+
+                    <div id="subctrl-newton-3" class="space-y-3.5 hidden">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Khối lượng xe 1 (m₁)</span>
+                                <span id="val-n3-m1" class="font-mono-tech font-bold text-blue-600">1.0 kg</span>
+                            </div>
+                            <input type="range" id="inp-n3-m1" min="0.5" max="5.0" step="0.5" value="1.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Khối lượng xe 2 (m₂)</span>
+                                <span id="val-n3-m2" class="font-mono-tech font-bold text-emerald-600">2.0 kg</span>
+                            </div>
+                            <input type="range" id="inp-n3-m2" min="0.5" max="5.0" step="0.5" value="2.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Độ lớn lực bung lò xo (F)</span>
+                                <span id="val-n3-f" class="font-mono-tech font-bold text-rose-600">6.0 N</span>
+                            </div>
+                            <input type="range" id="inp-n3-f" min="2" max="15" step="1" value="6" oninput="updateParams()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Điều khiển Moment lực (Bài 21) -->
+                <div id="controls-moment" class="space-y-3.5 hidden">
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-blue-600 font-semibold">Khối lượng bên trái (m₁)</span>
+                            <span id="val-mom-m1" class="font-mono-tech font-bold text-blue-600">0.20 kg</span>
+                        </div>
+                        <input type="range" id="inp-mom-m1" min="0.05" max="0.50" step="0.05" value="0.20" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-blue-600 font-semibold">Cánh tay đòn trái (d₁)</span>
+                            <span id="val-mom-d1" class="font-mono-tech font-bold text-blue-600">0.20 m</span>
+                        </div>
+                        <input type="range" id="inp-mom-d1" min="0.05" max="0.30" step="0.05" value="0.20" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-emerald-600 font-semibold">Khối lượng bên phải (m₂)</span>
+                            <span id="val-mom-m2" class="font-mono-tech font-bold text-emerald-600">0.40 kg</span>
+                        </div>
+                        <input type="range" id="inp-mom-m2" min="0.05" max="0.50" step="0.05" value="0.40" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-emerald-600 font-semibold">Cánh tay đòn phải (d₂)</span>
+                            <span id="val-mom-d2" class="font-mono-tech font-bold text-emerald-600">0.10 m</span>
+                        </div>
+                        <input type="range" id="inp-mom-d2" min="0.05" max="0.30" step="0.05" value="0.10" oninput="updateParams()">
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1.5 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Moment trái M₁ = P₁·d₁:</span>
+                            <span id="disp-mom-m1" class="font-mono-tech font-bold text-cyan-400">0.392 N.m</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Moment phải M₂ = P₂·d₂:</span>
+                            <span id="disp-mom-m2" class="font-mono-tech font-bold text-amber-400">0.392 N.m</span>
+                        </div>
+                        <div class="flex justify-between border-t border-slate-700 pt-1.5">
+                            <span class="text-slate-300">Trạng thái thước:</span>
+                            <span id="disp-mom-status" class="font-bold text-emerald-400">CÂN BẰNG (M₁ = M₂)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Điều khiển Động lượng & Va chạm (Bài 29) -->
+                <div id="controls-momentum" class="space-y-3.5 hidden">
+                    <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="setCollType('elastic')" id="btn-coll-elastic" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition">
+                            Va chạm đàn hồi
+                        </button>
+                        <button onclick="setCollType('inelastic')" id="btn-coll-inelastic" class="py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition">
+                            Va chạm mềm
+                        </button>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-blue-600 font-semibold">Khối lượng vật 1 (m₁)</span>
+                            <span id="val-col-m1" class="font-mono-tech font-bold text-blue-600">2.0 kg</span>
+                        </div>
+                        <input type="range" id="inp-col-m1" min="0.5" max="5.0" step="0.5" value="2.0" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-blue-600 font-semibold">Vận tốc đầu vật 1 (v₁)</span>
+                            <span id="val-col-v1" class="font-mono-tech font-bold text-blue-600">4.0 m/s</span>
+                        </div>
+                        <input type="range" id="inp-col-v1" min="0" max="8" step="0.5" value="4.0" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-emerald-600 font-semibold">Khối lượng vật 2 (m₂)</span>
+                            <span id="val-col-m2" class="font-mono-tech font-bold text-emerald-600">2.0 kg</span>
+                        </div>
+                        <input type="range" id="inp-col-m2" min="0.5" max="5.0" step="0.5" value="2.0" oninput="updateParams()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm font-medium mb-1">
+                            <span class="text-emerald-600 font-semibold">Vận tốc đầu vật 2 (v₂)</span>
+                            <span id="val-col-v2" class="font-mono-tech font-bold text-emerald-600">-1.0 m/s</span>
+                        </div>
+                        <input type="range" id="inp-col-v2" min="-6" max="4" step="0.5" value="-1.0" oninput="updateParams()">
+                    </div>
+
+                    <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1 text-xs">
+                        <div class="flex justify-between"><span class="text-slate-400">Tổng động lượng trước (p_trước):</span><span id="disp-col-pbefore" class="font-mono-tech font-bold text-cyan-400">6.00 kg.m/s</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400">Tổng động lượng sau (p_sau):</span><span id="disp-col-pafter" class="font-mono-tech font-bold text-emerald-400">6.00 kg.m/s</span></div>
+                    </div>
+                </div>
+
+                <!-- 7. Điều khiển Chuyển động tròn đều & Định luật Hooke -->
+                <div id="controls-circular_hooke" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="setCHMode('circular')" id="btn-ch-circular" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition">
+                            1. Chuyển động tròn đều
+                        </button>
+                        <button onclick="setCHMode('hooke')" id="btn-ch-hooke" class="py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition">
+                            2. Định luật Hooke
+                        </button>
+                    </div>
+
+                    <div id="subctrl-ch-circular" class="space-y-3.5">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Bán kính quỹ đạo (r)</span>
+                                <span id="val-cir-r" class="font-mono-tech font-bold text-blue-600">0.50 m</span>
+                            </div>
+                            <input type="range" id="inp-cir-r" min="0.20" max="1.00" step="0.05" value="0.50" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Tốc độ góc (ω)</span>
+                                <span id="val-cir-w" class="font-mono-tech font-bold text-blue-600">3.0 rad/s</span>
+                            </div>
+                            <input type="range" id="inp-cir-w" min="1.0" max="8.0" step="0.5" value="3.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Khối lượng vật (m)</span>
+                                <span id="val-cir-m" class="font-mono-tech font-bold text-blue-600">0.5 kg</span>
+                            </div>
+                            <input type="range" id="inp-cir-m" min="0.1" max="2.0" step="0.1" value="0.5" oninput="updateParams()">
+                        </div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-400">Tốc độ dài v = ω·r:</span><span id="disp-cir-v" class="font-mono-tech font-bold text-cyan-400">1.50 m/s</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Gia tốc hướng tâm a_ht = ω²r:</span><span id="disp-cir-a" class="font-mono-tech font-bold text-amber-400">4.50 m/s²</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Lực hướng tâm F_ht = m·a_ht:</span><span id="disp-cir-f" class="font-mono-tech font-bold text-rose-400">2.25 N</span></div>
+                        </div>
+                    </div>
+
+                    <div id="subctrl-ch-hooke" class="space-y-3.5 hidden">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Độ cứng lò xo (k)</span>
+                                <span id="val-hk-k" class="font-mono-tech font-bold text-blue-600">50 N/m</span>
+                            </div>
+                            <input type="range" id="inp-hk-k" min="20" max="150" step="5" value="50" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Khối lượng vật treo (m)</span>
+                                <span id="val-hk-m" class="font-mono-tech font-bold text-blue-600">0.30 kg</span>
+                            </div>
+                            <input type="range" id="inp-hk-m" min="0.05" max="1.00" step="0.05" value="0.30" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Chiều dài tự nhiên (l₀)</span>
+                                <span id="val-hk-l0" class="font-mono-tech font-bold text-blue-600">0.20 m</span>
+                            </div>
+                            <input type="range" id="inp-hk-l0" min="0.10" max="0.40" step="0.05" value="0.20" oninput="updateParams()">
+                        </div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-400">Độ dãn lò xo Δl = mg/k:</span><span id="disp-hk-dl" class="font-mono-tech font-bold text-cyan-400">5.88 cm</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Lực đàn hồi F_đh = k|Δl|:</span><span id="disp-hk-f" class="font-mono-tech font-bold text-emerald-400">2.94 N</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Điều khiển Con lắc đơn & Mạch điện một chiều (Vật lí 11) -->
+                <div id="controls-pendulum_circuit" class="space-y-4 hidden">
+                    <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="setPCMode('pendulum')" id="btn-pc-pendulum" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition">
+                            1. Con lắc đơn
+                        </button>
+                        <button onclick="setPCMode('circuit')" id="btn-pc-circuit" class="py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition">
+                            2. Mạch điện ĐL Ôm
+                        </button>
+                    </div>
+
+                    <div id="subctrl-pc-pendulum" class="space-y-3.5">
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Chiều dài dây treo (l)</span>
+                                <span id="val-pen-l" class="font-mono-tech font-bold text-blue-600">1.0 m</span>
+                            </div>
+                            <input type="range" id="inp-pen-l" min="0.2" max="2.5" step="0.1" value="1.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Biên độ góc ban đầu (α₀)</span>
+                                <span id="val-pen-a0" class="font-mono-tech font-bold text-blue-600">15°</span>
+                            </div>
+                            <input type="range" id="inp-pen-a0" min="5" max="45" step="1" value="15" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Gia tốc trọng trường (g)</span>
+                                <span id="val-pen-g" class="font-mono-tech font-bold text-blue-600">9.8 m/s²</span>
+                            </div>
+                            <input type="range" id="inp-pen-g" min="1.6" max="20" step="0.1" value="9.8" oninput="updateParams()">
+                        </div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 text-xs flex justify-between">
+                            <span class="text-slate-400">Chu kì dao động T = 2π√(l/g):</span>
+                            <span id="disp-pen-t" class="font-mono-tech font-bold text-emerald-400">2.01 s</span>
+                        </div>
+                    </div>
+
+                    <div id="subctrl-pc-circuit" class="space-y-3.5 hidden">
+                        <div class="flex items-center justify-between bg-slate-100 p-2.5 rounded-xl">
+                            <span class="text-sm font-bold text-slate-700">Công tắc mạch điện (Khóa K)</span>
+                            <button id="btn-switch-k" onclick="toggleSwitchK()" class="px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow">
+                                ĐANG ĐÓNG (ON)
+                            </button>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Suất điện động nguồn (ξ)</span>
+                                <span id="val-cir-emf" class="font-mono-tech font-bold text-blue-600">12.0 V</span>
+                            </div>
+                            <input type="range" id="inp-cir-emf" min="3" max="24" step="1" value="12" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Điện trở trong nguồn (r)</span>
+                                <span id="val-cir-r" class="font-mono-tech font-bold text-blue-600">1.0 Ω</span>
+                            </div>
+                            <input type="range" id="inp-cir-r" min="0.5" max="5.0" step="0.5" value="1.0" oninput="updateParams()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm font-medium mb-1">
+                                <span class="text-slate-700">Biến trở con chạy (R_b)</span>
+                                <span id="val-cir-rb" class="font-mono-tech font-bold text-blue-600">5.0 Ω</span>
+                            </div>
+                            <input type="range" id="inp-cir-rb" min="1" max="20" step="1" value="5" oninput="updateParams()">
+                        </div>
+                        <div class="bg-slate-900 text-white p-3.5 rounded-xl border border-slate-700 space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-slate-400">Cường độ dòng điện I = ξ/(R_N+r):</span><span id="disp-cir-i" class="font-mono-tech font-bold text-amber-400">1.20 A</span></div>
+                            <div class="flex justify-between"><span class="text-slate-400">Hiệu điện thế mạch ngoài U_N:</span><span id="disp-cir-u" class="font-mono-tech font-bold text-cyan-400">10.80 V</span></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Cột phải: Khung Canvas mô phỏng + Đồ thị thời gian thực -->
+            <div class="lg:col-span-8 flex flex-col gap-4">
+                <!-- Khung mô phỏng tương tác -->
+                <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200 flex flex-col gap-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Khu vực mô phỏng trực quan</span>
+                        <div id="live-readout-badges" class="flex flex-wrap gap-1.5 text-xs font-mono-tech"></div>
+                    </div>
+                    <div id="sim-canvas-container" class="w-full h-[330px] sm:h-[370px] rounded-xl overflow-hidden bg-slate-900 relative border border-slate-800">
+                        <canvas id="simCanvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+
+                <!-- Đồ thị thời gian thực -->
+                <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200 flex flex-col gap-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+                        <span id="graph-title" class="text-xs font-bold uppercase tracking-wider text-slate-500">Đồ thị vận tốc theo thời gian v(t)</span>
+                        <div id="graph-legend" class="flex items-center gap-3 text-xs font-medium"></div>
+                    </div>
+                    <div id="graph-canvas-container" class="w-full h-[170px] rounded-xl overflow-hidden bg-slate-50 border border-slate-200">
+                        <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bảng ghi chép số liệu báo cáo thực hành -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div>
+                    <h3 class="text-sm font-extrabold text-slate-800">BẢNG GHI CHÉP SỐ LIỆU BÁO CÁO THỰC HÀNH</h3>
+                    <p class="text-xs text-slate-500">Nhấn nút <b>+ Ghi số liệu</b> ở thanh trên để lưu kết quả từng lần đo vào bảng.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="copyTableData()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-300 transition">
+                        📋 Sao chép bảng
+                    </button>
+                    <button onclick="clearTableData()" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold border border-rose-200 transition">
+                        🗑 Xóa bảng
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead id="data-table-head" class="bg-slate-100 text-slate-700 font-bold uppercase"></thead>
+                    <tbody id="data-table-body" class="divide-y divide-slate-200 font-mono-tech"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- TRẠNG THÁI TOÀN CỤC ---
+        let currentLab = 'speed';
+        let isRunning = false;
+        let simTime = 0;
+        let lastFrameTime = null;
+        let graphHistory = [];
+        let recordedData = {
+            speed: [],
+            projectile: [],
+            forces: [],
+            newton: [],
+            moment: [],
+            momentum: [],
+            circular_hooke: [],
+            pendulum_circuit: []
+        };
+
+        const state = {
+            speed: {
+                angle: 15, xA: 0.20, xB: 0.80, d: 0.020, mu: 0.02,
+                pos: 0, vel: 0, tA: 0, tB: 0, tAB: 0, passedA: false, passedB: false
+            },
+            projectile: {
+                mode: 'newton_tube',
+                vacuum: true,
+                tubeH: 2.0,
+                tubeG: 9.8,
+                ballY: 2.0,
+                ballV: 0,
+                ballTime: 0,
+                ballLanded: false,
+                featherY: 2.0,
+                featherV: 0,
+                featherTime: 0,
+                featherLanded: false,
+                h: 40,
+                v0: 15,
+                angle: 0,
+                g: 9.8,
+                drag: false,
+                kDrag: 0.035,
+                x: 0,
+                y: 40,
+                vx: 15,
+                vy: 0,
+                maxY: 40,
+                maxYX: 0,
+                trail: [{x: 0, y: 40}],
+                landed: false
+            },
+            forces: {
+                mode: 'compose',
+                f1: 40, f2: 30, alpha: 60, angle1: 0,
+                draggingVec: null,
+                incAlpha: 30, incM: 2.0, incMu: 0.20, slidePos: 0, slideVel: 0
+            },
+            newton: {
+                law: 1,
+                n1V0: 6.0, n1Mu: 0.05, cartX: 0.5, boxOffset: 0, boxVel: 6.0, crashed: false,
+                n2F: 4.0, n2M: 2.0, n2Mu: 0.00, n2Pos: 0, n2Vel: 0,
+                n3M1: 1.0, n3M2: 2.0, n3F: 6.0, n3X1: -0.3, n3X2: 0.3, n3V1: 0, n3V2: 0, n3Released: false
+            },
+            moment: {
+                m1: 0.20, d1: 0.20, m2: 0.40, d2: 0.10, tiltAngle: 0, omega: 0
+            },
+            momentum: {
+                type: 'elastic', m1: 2.0, v1: 4.0, m2: 2.0, v2: -1.0,
+                x1: -1.5, x2: 1.5, curV1: 4.0, curV2: -1.0, collided: false
+            },
+            circular_hooke: {
+                mode: 'circular',
+                r: 0.50, w: 3.0, m: 0.5, theta: 0,
+                k: 50, hkM: 0.30, l0: 0.20, curY: 0, vy: 0
+            },
+            pendulum_circuit: {
+                mode: 'pendulum',
+                l: 1.0, a0: 15, g: 9.8, theta: 15 * Math.PI / 180, omega: 0,
+                switchK: true, emf: 12, r: 1.0, rb: 5.0, rLamp: 4.0, electronPhase: 0
+            }
+        };
+
+        const simCanvas = document.getElementById('simCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+
+        const labMeta = {
+            speed: {
+                grade: 'Vật lí 10 • Bài 6: Thực hành đo tốc độ của vật chuyển động (KNTT)',
+                title: 'Thí nghiệm 1: Đo tốc độ trung bình và tốc độ tức thời bằng cổng quang điện',
+                desc: 'Thả viên bi thép lăn trên máng nghiêng qua hai cổng quang điện A và B nối với đồng hồ đo thời gian hiện số.',
+                graphTitle: 'Đồ thị vận tốc tức thời theo thời gian v(t)',
+                legend: `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Vận tốc viên bi v (m/s)</span>`
+            },
+            projectile: {
+                grade: 'Vật lí 10 • Bài 10 & Bài 12: Sự rơi tự do & Chuyển động ném (KNTT)',
+                title: 'Thí nghiệm 2: Ống chân không của Newton (Rơi tự do) & Chuyển động ném',
+                desc: 'So sánh sự rơi của viên bi chì và lông chim trong không khí/chân không, và khảo sát quỹ đạo ném ngang, ném xiên.',
+                graphTitle: 'Đồ thị vận tốc rơi tự do v(t) của Viên bi chì và Lông chim',
+                legend: `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Viên bi chì v_bi(t)</span>
+                         <span class="flex items-center gap-1 text-amber-600"><span class="w-3 h-0.5 bg-amber-600"></span> Lông chim v_lông(t)</span>`
+            },
+            forces: {
+                grade: 'Vật lí 10 • Bài 13 & Bài 22: Tổng hợp và phân tích lực (KNTT)',
+                title: 'Thí nghiệm 3: Quy tắc hình bình hành & Phân tích lực trên mặt phẳng nghiêng',
+                desc: 'Kéo thả trực tiếp vectơ lực trên thước đo góc hoặc khảo sát vật trượt trên mặt phẳng nghiêng có ma sát.',
+                graphTitle: 'Đồ thị độ lớn hợp lực F theo góc xen giữa α',
+                legend: `<span class="flex items-center gap-1 text-rose-600"><span class="w-3 h-0.5 bg-rose-600"></span> Hợp lực F(α)</span>`
+            },
+            newton: {
+                grade: 'Vật lí 10 • Bài 14, 15, 16: Ba Định luật Newton (KNTT)',
+                title: 'Thí nghiệm 4: Khảo sát Quán tính, Định luật II (a = F/m) và Định luật III Newton',
+                desc: 'Trực quan hóa 3 định luật cơ bản của cơ học cổ điển với các thông số lực, khối lượng và ma sát tùy chỉnh.',
+                graphTitle: 'Đồ thị vận tốc chuyển động v(t)',
+                legend: `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Vận tốc v₁(t)</span>
+                         <span class="flex items-center gap-1 text-emerald-600"><span class="w-3 h-0.5 bg-emerald-600"></span> Vận tốc v₂(t)</span>`
+            },
+            moment: {
+                grade: 'Vật lí 10 • Bài 21: Moment lực. Cân bằng của vật rắn (KNTT)',
+                title: 'Thí nghiệm 5: Quy tắc Moment lực và điều kiện cân bằng vật có trục quay cố định',
+                desc: 'Thay đổi khối lượng quả nặng và cánh tay đòn d₁, d₂ để kiểm chứng điều kiện cân bằng M₁ = M₂.',
+                graphTitle: 'So sánh độ lớn Moment lực M₁ và M₂ (N.m)',
+                legend: `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Moment M₁</span>
+                         <span class="flex items-center gap-1 text-emerald-600"><span class="w-3 h-0.5 bg-emerald-600"></span> Moment M₂</span>`
+            },
+            momentum: {
+                grade: 'Vật lí 10 • Bài 29: Định luật bảo toàn động lượng (KNTT)',
+                title: 'Thí nghiệm 6: Va chạm đàn hồi và va chạm mềm trên băng đệm khí',
+                desc: 'Kiểm chứng định luật bảo toàn tổng động lượng của hệ hai vật cô lập trước và sau va chạm.',
+                graphTitle: 'Đồ thị động lượng p₁(t), p₂(t) và tổng động lượng p(t)',
+                legend: `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> p₁</span>
+                         <span class="flex items-center gap-1 text-emerald-600"><span class="w-3 h-0.5 bg-emerald-600"></span> p₂</span>
+                         <span class="flex items-center gap-1 text-rose-600"><span class="w-3 h-0.5 bg-rose-600"></span> Tổng p</span>`
+            },
+            circular_hooke: {
+                grade: 'Vật lí 10 • Bài 31, 32, 33: Chuyển động tròn đều & Biến dạng đàn hồi (KNTT)',
+                title: 'Thí nghiệm 7: Lực hướng tâm trong chuyển động tròn đều & Định luật Hooke',
+                desc: 'Quan sát vectơ vận tốc tiếp tuyến, gia tốc hướng tâm và đo độ dãn lò xo theo khối lượng vật treo.',
+                graphTitle: 'Đồ thị tọa độ / độ dãn theo thời gian',
+                legend: `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Đại lượng khảo sát</span>`
+            },
+            pendulum_circuit: {
+                grade: 'Mở rộng Vật lí 11 • Dao động điều hòa & Định luật Ôm cho toàn mạch (KNTT)',
+                title: 'Thí nghiệm 8: Con lắc đơn & Khảo sát mạch điện một chiều',
+                desc: 'Đo chu kì dao động nhỏ của con lắc đơn và khảo sát dòng điện chạy trong mạch kín.',
+                graphTitle: 'Đồ thị li độ góc α(t) / Đặc tuyến Vôn-Ampe',
+                legend: `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Đồ thị đặc trưng</span>`
+            }
+        };
+
+        function showToast(msg) {
+            const box = document.getElementById('toast-box');
+            box.textContent = msg;
+            box.classList.remove('hidden');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => box.classList.add('hidden'), 2200);
+        }
+
+        function switchLab(labId) {
+            currentLab = labId;
+            isRunning = false;
+            updatePlayButtonUI();
+
+            document.querySelectorAll('.lab-tab').forEach(btn => {
+                btn.className = 'lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700 transition';
+            });
+            const activeTab = document.getElementById(`tab-${labId}`);
+            if (activeTab) {
+                activeTab.className = 'lab-tab px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow transition';
+            }
+
+            Object.keys(labMeta).forEach(key => {
+                const panel = document.getElementById(`controls-${key}`);
+                if (panel) panel.classList.toggle('hidden', key !== labId);
+            });
+
+            const meta = labMeta[labId];
+            document.getElementById('lab-grade-badge').textContent = meta.grade;
+            document.getElementById('lab-title').textContent = meta.title;
+            document.getElementById('lab-desc').textContent = meta.desc;
+            document.getElementById('graph-title').textContent = meta.graphTitle;
+            document.getElementById('graph-legend').innerHTML = meta.legend;
+
+            if (labId === 'projectile') {
+                setProjMode(state.projectile.mode);
+                return;
+            }
+            resetSimulation();
+            renderTable();
+        }
+
+        function setProjMode(mode) {
+            state.projectile.mode = mode;
+            document.getElementById('btn-pmode-newton').className = mode === 'newton_tube'
+                ? 'py-2 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+            document.getElementById('btn-pmode-throw').className = mode === 'throw'
+                ? 'py-2 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+
+            document.getElementById('subctrl-proj-newton').classList.toggle('hidden', mode !== 'newton_tube');
+            document.getElementById('subctrl-proj-throw').classList.toggle('hidden', mode !== 'throw');
+
+            if (mode === 'newton_tube') {
+                document.getElementById('graph-title').textContent = 'Đồ thị vận tốc rơi tự do v(t) của Viên bi chì và Lông chim';
+                document.getElementById('graph-legend').innerHTML = `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Viên bi chì v_bi(t)</span><span class="flex items-center gap-1 text-amber-600"><span class="w-3 h-0.5 bg-amber-600"></span> Lông chim v_lông(t)</span>`;
+            } else {
+                document.getElementById('graph-title').textContent = 'Đồ thị độ lớn vận tốc theo thời gian v(t)';
+                document.getElementById('graph-legend').innerHTML = `<span class="flex items-center gap-1 text-blue-600"><span class="w-3 h-0.5 bg-blue-600"></span> Vận tốc tổng hợp v (m/s)</span><span class="flex items-center gap-1 text-emerald-600"><span class="w-3 h-0.5 bg-emerald-600"></span> Thành phần |vᵧ| (m/s)</span>`;
+            }
+            resetSimulation();
+            renderTable();
+        }
+
+        function toggleVacuumTube() {
+            state.projectile.vacuum = !state.projectile.vacuum;
+            const btn = document.getElementById('btn-vacuum-toggle');
+            if (state.projectile.vacuum) {
+                btn.textContent = 'CHÂN KHÔNG (Hút hết khí)';
+                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow transition';
+            } else {
+                btn.textContent = 'CÓ KHÔNG KHÍ (Mở van)';
+                btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white shadow transition';
+            }
+            resetSimulation();
+        }
+
+        function setG(prefix, val) {
+            document.getElementById(`inp-${prefix}-g`).value = val;
+            updateParams();
+        }
+
+        function setForceMode(mode) {
+            state.forces.mode = mode;
+            document.getElementById('btn-fmode-compose').className = mode === 'compose'
+                ? 'py-2 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+            document.getElementById('btn-fmode-decompose').className = mode === 'decompose'
+                ? 'py-2 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+            document.getElementById('subctrl-force-compose').classList.toggle('hidden', mode !== 'compose');
+            document.getElementById('subctrl-force-decompose').classList.toggle('hidden', mode !== 'decompose');
+            resetSimulation();
+        }
+
+        function setNewtonLaw(law) {
+            state.newton.law = law;
+            [1, 2, 3].forEach(n => {
+                document.getElementById(`btn-nlaw-${n}`).className = n === law
+                    ? 'py-1.5 px-1 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                    : 'py-1.5 px-1 rounded-lg text-xs font-bold text-slate-600 transition';
+                document.getElementById(`subctrl-newton-${n}`).classList.toggle('hidden', n !== law);
+            });
+            resetSimulation();
+        }
+
+        function setCollType(type) {
+            state.momentum.type = type;
+            document.getElementById('btn-coll-elastic').className = type === 'elastic'
+                ? 'py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition';
+            document.getElementById('btn-coll-inelastic').className = type === 'inelastic'
+                ? 'py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition';
+            resetSimulation();
+        }
+
+        function setCHMode(mode) {
+            state.circular_hooke.mode = mode;
+            document.getElementById('btn-ch-circular').className = mode === 'circular'
+                ? 'py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition';
+            document.getElementById('btn-ch-hooke').className = mode === 'hooke'
+                ? 'py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition';
+            document.getElementById('subctrl-ch-circular').classList.toggle('hidden', mode !== 'circular');
+            document.getElementById('subctrl-ch-hooke').classList.toggle('hidden', mode !== 'hooke');
+            resetSimulation();
+        }
+
+        function setPCMode(mode) {
+            state.pendulum_circuit.mode = mode;
+            document.getElementById('btn-pc-pendulum').className = mode === 'pendulum'
+                ? 'py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition';
+            document.getElementById('btn-pc-circuit').className = mode === 'circuit'
+                ? 'py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-blue-600 shadow transition'
+                : 'py-1.5 px-2 rounded-lg text-xs font-bold text-slate-600 transition';
+            document.getElementById('subctrl-pc-pendulum').classList.toggle('hidden', mode !== 'pendulum');
+            document.getElementById('subctrl-pc-circuit').classList.toggle('hidden', mode !== 'circuit');
+            resetSimulation();
+        }
+
+        function toggleSwitchK() {
+            state.pendulum_circuit.switchK = !state.pendulum_circuit.switchK;
+            const btn = document.getElementById('btn-switch-k');
+            btn.textContent = state.pendulum_circuit.switchK ? 'ĐANG ĐÓNG (ON)' : 'ĐANG MỞ (OFF)';
+            btn.className = state.pendulum_circuit.switchK
+                ? 'px-3 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow'
+                : 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white shadow';
+            updateParams();
+        }
+
+        function updateParams() {
+            if (currentLab === 'speed') {
+                const s = state.speed;
+                s.angle = parseFloat(document.getElementById('inp-spd-angle').value);
+                s.xA = parseFloat(document.getElementById('inp-spd-xa').value);
+                s.xB = parseFloat(document.getElementById('inp-spd-xb').value);
+                s.d = parseFloat(document.getElementById('inp-spd-d').value);
+                s.mu = parseFloat(document.getElementById('inp-spd-mu').value);
+                document.getElementById('val-spd-angle').textContent = `${s.angle}°`;
+                document.getElementById('val-spd-xa').textContent = `${s.xA.toFixed(2)} m`;
+                document.getElementById('val-spd-xb').textContent = `${s.xB.toFixed(2)} m`;
+                document.getElementById('val-spd-d').textContent = `${s.d.toFixed(3)} m`;
+                document.getElementById('val-spd-mu').textContent = `${s.mu.toFixed(2)}`;
+            } else if (currentLab === 'projectile') {
+                const p = state.projectile;
+                if (p.mode === 'newton_tube') {
+                    p.tubeH = parseFloat(document.getElementById('inp-ntube-h').value);
+                    p.tubeG = parseFloat(document.getElementById('inp-ntube-g').value);
+                    document.getElementById('val-ntube-h').textContent = `${p.tubeH.toFixed(1)} m`;
+                    document.getElementById('val-ntube-g').textContent = `${p.tubeG.toFixed(1)} m/s²`;
+                    const tTheo = Math.sqrt((2 * p.tubeH) / p.tubeG);
+                    document.getElementById('disp-ntube-ttheo').textContent = `${tTheo.toFixed(2)} s`;
+                    if (!isRunning && simTime === 0) {
+                        p.ballY = p.tubeH;
+                        p.featherY = p.tubeH;
+                    }
+                } else {
+                    const h = parseFloat(document.getElementById('inp-proj-h').value);
+                    const v0 = parseFloat(document.getElementById('inp-proj-v0').value);
+                    const angle = parseFloat(document.getElementById('inp-proj-angle').value);
+                    const g = parseFloat(document.getElementById('inp-proj-g').value);
+                    const drag = document.getElementById('inp-proj-drag').checked;
+                    const kDrag = parseFloat(document.getElementById('inp-proj-k').value);
+
+                    document.getElementById('val-proj-h').textContent = `${h} m`;
+                    document.getElementById('val-proj-v0').textContent = `${v0} m/s`;
+                    document.getElementById('val-proj-angle').textContent = `${angle}°`;
+                    document.getElementById('val-proj-g').textContent = `${g.toFixed(1)} m/s²`;
+                    document.getElementById('val-proj-k').textContent = `${kDrag.toFixed(3)}`;
+                    document.getElementById('proj-drag-coeff-box').classList.toggle('hidden', !drag);
+
+                    p.h = h;
+                    p.v0 = v0;
+                    p.angle = angle;
+                    p.g = g;
+                    p.drag = drag;
+                    p.kDrag = kDrag;
+
+                    if (!isRunning && simTime === 0) {
+                        const rad = angle * Math.PI / 180;
+                        p.x = 0;
+                        p.y = h;
+                        p.vx = v0 * Math.cos(rad);
+                        p.vy = v0 * Math.sin(rad);
+                        p.maxY = h;
+                        p.maxYX = 0;
+                        p.trail = [{x: 0, y: h}];
+                        p.landed = false;
+                    }
+
+                    const radCalc = angle * Math.PI / 180;
+                    const vy0 = v0 * Math.sin(radCalc);
+                    const vx0 = v0 * Math.cos(radCalc);
+                    const hMaxTheo = h + (vy0 * vy0) / (2 * g);
+                    const tFlightTheo = (vy0 + Math.sqrt(vy0 * vy0 + 2 * g * h)) / g;
+                    const rangeTheo = vx0 * tFlightTheo;
+                    document.getElementById('disp-proj-hmax').textContent = `${(p.drag && (isRunning || simTime > 0) ? p.maxY : hMaxTheo).toFixed(2)} m`;
+                    document.getElementById('disp-proj-range').textContent = `${rangeTheo.toFixed(2)} m`;
+                }
+            } else if (currentLab === 'forces') {
+                const f = state.forces;
+                f.f1 = parseFloat(document.getElementById('inp-f1').value);
+                f.f2 = parseFloat(document.getElementById('inp-f2').value);
+                f.alpha = parseFloat(document.getElementById('inp-falpha').value);
+                document.getElementById('val-f1').textContent = `${f.f1} N`;
+                document.getElementById('val-f2').textContent = `${f.f2} N`;
+                document.getElementById('val-falpha').textContent = `${f.alpha}°`;
+
+                const rad = f.alpha * Math.PI / 180;
+                const fSum = Math.sqrt(f.f1 * f.f1 + f.f2 * f.f2 + 2 * f.f1 * f.f2 * Math.cos(rad));
+                const theta = Math.atan2(f.f2 * Math.sin(rad), f.f1 + f.f2 * Math.cos(rad)) * 180 / Math.PI;
+                document.getElementById('disp-fsum').textContent = `${fSum.toFixed(2)} N`;
+                document.getElementById('disp-ftheta').textContent = `${theta.toFixed(1)}°`;
+
+                f.incAlpha = parseFloat(document.getElementById('inp-inc-alpha').value);
+                f.incM = parseFloat(document.getElementById('inp-inc-m').value);
+                f.incMu = parseFloat(document.getElementById('inp-inc-mu').value);
+                document.getElementById('val-inc-alpha').textContent = `${f.incAlpha}°`;
+                document.getElementById('val-inc-m').textContent = `${f.incM.toFixed(1)} kg`;
+                document.getElementById('val-inc-mu').textContent = `${f.incMu.toFixed(2)}`;
+
+                const incRad = f.incAlpha * Math.PI / 180;
+                const P = f.incM * 9.8;
+                const Px = P * Math.sin(incRad);
+                const Py = P * Math.cos(incRad);
+                const Fms = f.incMu * Py;
+                const a = Px > Fms ? (Px - Fms) / f.incM : 0;
+                document.getElementById('disp-inc-p').textContent = `${P.toFixed(2)} N`;
+                document.getElementById('disp-inc-px').textContent = `${Px.toFixed(2)} N`;
+                document.getElementById('disp-inc-py').textContent = `${Py.toFixed(2)} N`;
+                document.getElementById('disp-inc-a').textContent = `${a.toFixed(2)} m/s²`;
+            } else if (currentLab === 'newton') {
+                const nw = state.newton;
+                nw.n1V0 = parseFloat(document.getElementById('inp-n1-v0').value);
+                nw.n1Mu = parseFloat(document.getElementById('inp-n1-mu').value);
+                document.getElementById('val-n1-v0').textContent = `${nw.n1V0.toFixed(1)} m/s`;
+                document.getElementById('val-n1-mu').textContent = `${nw.n1Mu.toFixed(2)}`;
+                if (!isRunning && simTime === 0) nw.boxVel = nw.n1V0;
+
+                nw.n2F = parseFloat(document.getElementById('inp-n2-f').value);
+                nw.n2M = parseFloat(document.getElementById('inp-n2-m').value);
+                nw.n2Mu = parseFloat(document.getElementById('inp-n2-mu').value);
+                document.getElementById('val-n2-f').textContent = `${nw.n2F.toFixed(1)} N`;
+                document.getElementById('val-n2-m').textContent = `${nw.n2M.toFixed(1)} kg`;
+                document.getElementById('val-n2-mu').textContent = `${nw.n2Mu.toFixed(2)}`;
+                const a2 = Math.max(0, (nw.n2F - nw.n2Mu * nw.n2M * 9.8) / nw.n2M);
+                document.getElementById('disp-n2-a').textContent = `${a2.toFixed(2)} m/s²`;
+
+                nw.n3M1 = parseFloat(document.getElementById('inp-n3-m1').value);
+                nw.n3M2 = parseFloat(document.getElementById('inp-n3-m2').value);
+                nw.n3F = parseFloat(document.getElementById('inp-n3-f').value);
+                document.getElementById('val-n3-m1').textContent = `${nw.n3M1.toFixed(1)} kg`;
+                document.getElementById('val-n3-m2').textContent = `${nw.n3M2.toFixed(1)} kg`;
+                document.getElementById('val-n3-f').textContent = `${nw.n3F.toFixed(1)} N`;
+            } else if (currentLab === 'moment') {
+                const mo = state.moment;
+                mo.m1 = parseFloat(document.getElementById('inp-mom-m1').value);
+                mo.d1 = parseFloat(document.getElementById('inp-mom-d1').value);
+                mo.m2 = parseFloat(document.getElementById('inp-mom-m2').value);
+                mo.d2 = parseFloat(document.getElementById('inp-mom-d2').value);
+                document.getElementById('val-mom-m1').textContent = `${mo.m1.toFixed(2)} kg`;
+                document.getElementById('val-mom-d1').textContent = `${mo.d1.toFixed(2)} m`;
+                document.getElementById('val-mom-m2').textContent = `${mo.m2.toFixed(2)} kg`;
+                document.getElementById('val-mom-d2').textContent = `${mo.d2.toFixed(2)} m`;
+                const M1 = mo.m1 * 9.8 * mo.d1;
+                const M2 = mo.m2 * 9.8 * mo.d2;
+                document.getElementById('disp-mom-m1').textContent = `${M1.toFixed(3)} N.m`;
+                document.getElementById('disp-mom-m2').textContent = `${M2.toFixed(3)} N.m`;
+                const statusEl = document.getElementById('disp-mom-status');
+                if (Math.abs(M1 - M2) < 0.005) {
+                    statusEl.textContent = 'CÂN BẰNG (M₁ = M₂)';
+                    statusEl.className = 'font-bold text-emerald-400';
+                } else if (M1 > M2) {
+                    statusEl.textContent = 'NGHIÊNG TRÁI (M₁ > M₂)';
+                    statusEl.className = 'font-bold text-cyan-400';
+                } else {
+                    statusEl.textContent = 'NGHIÊNG PHẢI (M₁ < M₂)';
+                    statusEl.className = 'font-bold text-amber-400';
+                }
+            } else if (currentLab === 'momentum') {
+                const co = state.momentum;
+                co.m1 = parseFloat(document.getElementById('inp-col-m1').value);
+                co.v1 = parseFloat(document.getElementById('inp-col-v1').value);
+                co.m2 = parseFloat(document.getElementById('inp-col-m2').value);
+                co.v2 = parseFloat(document.getElementById('inp-col-v2').value);
+                document.getElementById('val-col-m1').textContent = `${co.m1.toFixed(1)} kg`;
+                document.getElementById('val-col-v1').textContent = `${co.v1.toFixed(1)} m/s`;
+                document.getElementById('val-col-m2').textContent = `${co.m2.toFixed(1)} kg`;
+                document.getElementById('val-col-v2').textContent = `${co.v2.toFixed(1)} m/s`;
+                if (!isRunning && simTime === 0) {
+                    co.curV1 = co.v1;
+                    co.curV2 = co.v2;
+                }
+                const pBefore = co.m1 * co.v1 + co.m2 * co.v2;
+                document.getElementById('disp-col-pbefore').textContent = `${pBefore.toFixed(2)} kg.m/s`;
+                document.getElementById('disp-col-pafter').textContent = `${pBefore.toFixed(2)} kg.m/s`;
+            } else if (currentLab === 'circular_hooke') {
+                const ch = state.circular_hooke;
+                ch.r = parseFloat(document.getElementById('inp-cir-r').value);
+                ch.w = parseFloat(document.getElementById('inp-cir-w').value);
+                ch.m = parseFloat(document.getElementById('inp-cir-m').value);
+                document.getElementById('val-cir-r').textContent = `${ch.r.toFixed(2)} m`;
+                document.getElementById('val-cir-w').textContent = `${ch.w.toFixed(1)} rad/s`;
+                document.getElementById('val-cir-m').textContent = `${ch.m.toFixed(1)} kg`;
+                const v = ch.w * ch.r;
+                const aht = ch.w * ch.w * ch.r;
+                const fht = ch.m * aht;
+                document.getElementById('disp-cir-v').textContent = `${v.toFixed(2)} m/s`;
+                document.getElementById('disp-cir-a').textContent = `${aht.toFixed(2)} m/s²`;
+                document.getElementById('disp-cir-f').textContent = `${fht.toFixed(2)} N`;
+
+                ch.k = parseFloat(document.getElementById('inp-hk-k').value);
+                ch.hkM = parseFloat(document.getElementById('inp-hk-m').value);
+                ch.l0 = parseFloat(document.getElementById('inp-hk-l0').value);
+                document.getElementById('val-hk-k').textContent = `${ch.k} N/m`;
+                document.getElementById('val-hk-m').textContent = `${ch.hkM.toFixed(2)} kg`;
+                document.getElementById('val-hk-l0').textContent = `${ch.l0.toFixed(2)} m`;
+                const dl = (ch.hkM * 9.8) / ch.k;
+                document.getElementById('disp-hk-dl').textContent = `${(dl * 100).toFixed(2)} cm`;
+                document.getElementById('disp-hk-f').textContent = `${(ch.hkM * 9.8).toFixed(2)} N`;
+            } else if (currentLab === 'pendulum_circuit') {
+                const pc = state.pendulum_circuit;
+                pc.l = parseFloat(document.getElementById('inp-pen-l').value);
+                pc.a0 = parseFloat(document.getElementById('inp-pen-a0').value);
+                pc.g = parseFloat(document.getElementById('inp-pen-g').value);
+                document.getElementById('val-pen-l').textContent = `${pc.l.toFixed(1)} m`;
+                document.getElementById('val-pen-a0').textContent = `${pc.a0}°`;
+                document.getElementById('val-pen-g').textContent = `${pc.g.toFixed(1)} m/s²`;
+                const T = 2 * Math.PI * Math.sqrt(pc.l / pc.g);
+                document.getElementById('disp-pen-t').textContent = `${T.toFixed(2)} s`;
+                if (!isRunning && simTime === 0) pc.theta = pc.a0 * Math.PI / 180;
+
+                pc.emf = parseFloat(document.getElementById('inp-cir-emf').value);
+                pc.r = parseFloat(document.getElementById('inp-cir-r').value);
+                pc.rb = parseFloat(document.getElementById('inp-cir-rb').value);
+                document.getElementById('val-cir-emf').textContent = `${pc.emf.toFixed(1)} V`;
+                document.getElementById('val-cir-r').textContent = `${pc.r.toFixed(1)} Ω`;
+                document.getElementById('val-cir-rb').textContent = `${pc.rb.toFixed(1)} Ω`;
+                const Rn = pc.rb + pc.rLamp;
+                const I = pc.switchK ? pc.emf / (Rn + pc.r) : 0;
+                const U = I * Rn;
+                document.getElementById('disp-cir-i').textContent = `${I.toFixed(2)} A`;
+                document.getElementById('disp-cir-u').textContent = `${U.toFixed(2)} V`;
+            }
+
+            drawSim();
+            drawGraph();
+        }
+
+        function updatePlayButtonUI() {
+            const btn = document.getElementById('btn-play-pause');
+            if (isRunning) {
+                btn.innerHTML = '<span>⏸</span> <span>Tạm dừng</span>';
+                btn.className = 'px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold shadow transition flex items-center gap-1.5';
+            } else {
+                btn.innerHTML = '<span>▶</span> <span>Chạy</span>';
+                btn.className = 'px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow transition flex items-center gap-1.5';
+            }
+        }
+
+        function toggleSimulation() {
+            if (currentLab === 'projectile') {
+                const p = state.projectile;
+                if ((p.mode === 'newton_tube' && p.ballLanded && p.featherLanded) || (p.mode === 'throw' && p.landed)) {
+                    resetSimulation();
+                }
+            }
+            isRunning = !isRunning;
+            lastFrameTime = performance.now();
+            updatePlayButtonUI();
+        }
+
+        function resetSimulation() {
+            isRunning = false;
+            simTime = 0;
+            graphHistory = [];
+            updatePlayButtonUI();
+            document.getElementById('digital-timer').textContent = '0.00 s';
+
+            if (currentLab === 'speed') {
+                const s = state.speed;
+                s.pos = 0; s.vel = 0; s.tA = 0; s.tB = 0; s.tAB = 0; s.passedA = false; s.passedB = false;
+                document.getElementById('disp-spd-ta').textContent = '0.000 s';
+                document.getElementById('disp-spd-tb').textContent = '0.000 s';
+                document.getElementById('disp-spd-tab').textContent = '0.000 s';
+                document.getElementById('disp-spd-vb').textContent = '0.00 m/s';
+            } else if (currentLab === 'projectile') {
+                const p = state.projectile;
+                p.ballY = p.tubeH; p.ballV = 0; p.ballTime = 0; p.ballLanded = false;
+                p.featherY = p.tubeH; p.featherV = 0; p.featherTime = 0; p.featherLanded = false;
+                document.getElementById('disp-ntube-tball').textContent = '0.00 s';
+                document.getElementById('disp-ntube-tfeather').textContent = '0.00 s';
+
+                const rad = p.angle * Math.PI / 180;
+                p.x = 0; p.y = p.h;
+                p.vx = p.v0 * Math.cos(rad);
+                p.vy = p.v0 * Math.sin(rad);
+                p.maxY = p.h; p.maxYX = 0;
+                p.trail = [{x: 0, y: p.h}];
+                p.landed = false;
+            } else if (currentLab === 'forces') {
+                state.forces.slidePos = 0;
+                state.forces.slideVel = 0;
+            } else if (currentLab === 'newton') {
+                const nw = state.newton;
+                nw.cartX = 0.5; nw.boxOffset = 0; nw.boxVel = nw.n1V0; nw.crashed = false;
+                nw.n2Pos = 0; nw.n2Vel = 0;
+                nw.n3X1 = -0.3; nw.n3X2 = 0.3; nw.n3V1 = 0; nw.n3V2 = 0; nw.n3Released = false;
+            } else if (currentLab === 'moment') {
+                state.moment.tiltAngle = 0;
+                state.moment.omega = 0;
+            } else if (currentLab === 'momentum') {
+                const co = state.momentum;
+                co.x1 = -1.5; co.x2 = 1.5; co.curV1 = co.v1; co.curV2 = co.v2; co.collided = false;
+            } else if (currentLab === 'circular_hooke') {
+                state.circular_hooke.theta = 0;
+                state.circular_hooke.curY = 0;
+                state.circular_hooke.vy = 0;
+            } else if (currentLab === 'pendulum_circuit') {
+                state.pendulum_circuit.theta = state.pendulum_circuit.a0 * Math.PI / 180;
+                state.pendulum_circuit.omega = 0;
+            }
+
+            updateParams();
+        }
+
+        function stepPhysics(dt) {
+            if (!isRunning) return;
+
+            if (currentLab === 'speed') {
+                const s = state.speed;
+                simTime += dt;
+                const rad = s.angle * Math.PI / 180;
+                const a = Math.max(0, 9.8 * (Math.sin(rad) - s.mu * Math.cos(rad)));
+                s.vel += a * dt;
+                s.pos += s.vel * dt;
+
+                if (!s.passedA && s.pos >= s.xA) {
+                    s.passedA = true;
+                    s.tA = s.d / Math.max(s.vel, 0.05);
+                    s._timeAtA = simTime;
+                    document.getElementById('disp-spd-ta').textContent = `${s.tA.toFixed(3)} s`;
+                }
+                if (!s.passedB && s.pos >= s.xB) {
+                    s.passedB = true;
+                    s.tB = s.d / Math.max(s.vel, 0.05);
+                    s.tAB = simTime - (s._timeAtA || 0);
+                    const vB = s.d / s.tB;
+                    document.getElementById('disp-spd-tb').textContent = `${s.tB.toFixed(3)} s`;
+                    document.getElementById('disp-spd-tab').textContent = `${s.tAB.toFixed(3)} s`;
+                    document.getElementById('disp-spd-vb').textContent = `${vB.toFixed(2)} m/s`;
+                }
+                if (s.pos >= 1.2) {
+                    isRunning = false;
+                    updatePlayButtonUI();
+                }
+                graphHistory.push({ t: simTime, v: s.vel });
+            } else if (currentLab === 'projectile') {
+                const p = state.projectile;
+                if (p.mode === 'newton_tube') {
+                    if (p.ballLanded && p.featherLanded) return;
+                    simTime += dt;
+
+                    if (!p.ballLanded) {
+                        const dragBall = p.vacuum ? 0 : 0.015 * p.ballV * p.ballV;
+                        const aBall = Math.max(0, p.tubeG - dragBall);
+                        p.ballV += aBall * dt;
+                        p.ballY -= p.ballV * dt;
+                        p.ballTime += dt;
+                        if (p.ballY <= 0) {
+                            p.ballY = 0;
+                            p.ballLanded = true;
+                        }
+                        document.getElementById('disp-ntube-tball').textContent = `${p.ballTime.toFixed(2)} s`;
+                    }
+
+                    if (!p.featherLanded) {
+                        const dragFeather = p.vacuum ? 0 : 3.2 * p.featherV * p.featherV;
+                        const aFeather = Math.max(0, p.tubeG - dragFeather);
+                        p.featherV += aFeather * dt;
+                        p.featherY -= p.featherV * dt;
+                        p.featherTime += dt;
+                        if (p.featherY <= 0) {
+                            p.featherY = 0;
+                            p.featherLanded = true;
+                        }
+                        document.getElementById('disp-ntube-tfeather').textContent = `${p.featherTime.toFixed(2)} s`;
+                    }
+
+                    if (p.ballLanded && p.featherLanded) {
+                        isRunning = false;
+                        updatePlayButtonUI();
+                    }
+
+                    graphHistory.push({
+                        t: simTime,
+                        v1: p.ballLanded ? 0 : p.ballV,
+                        v2: p.featherLanded ? 0 : p.featherV
+                    });
+                    return;
+                }
+
+                if (p.landed) return;
+                simTime += dt;
+                const kDrag = p.drag ? p.kDrag : 0;
+                const v = Math.hypot(p.vx, p.vy);
+                const ax = -kDrag * v * p.vx;
+                const ay = -p.g - kDrag * v * p.vy;
+
+                p.vx += ax * dt;
+                p.vy += ay * dt;
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+
+                if (p.y > p.maxY) {
+                    p.maxY = p.y;
+                    p.maxYX = p.x;
+                    document.getElementById('disp-proj-hmax').textContent = `${p.maxY.toFixed(2)} m`;
+                }
+                if (p.y <= 0) {
+                    p.y = 0;
+                    p.landed = true;
+                    isRunning = false;
+                    updatePlayButtonUI();
+                }
+                p.trail.push({ x: p.x, y: p.y });
+                graphHistory.push({ t: simTime, v: Math.hypot(p.vx, p.vy), vy: Math.abs(p.vy) });
+            } else if (currentLab === 'forces') {
+                const f = state.forces;
+                if (f.mode === 'decompose') {
+                    simTime += dt;
+                    const incRad = f.incAlpha * Math.PI / 180;
+                    const P = f.incM * 9.8;
+                    const Px = P * Math.sin(incRad);
+                    const Fms = f.incMu * P * Math.cos(incRad);
+                    const a = Px > Fms ? (Px - Fms) / f.incM : 0;
+                    f.slideVel += a * dt;
+                    f.slidePos += f.slideVel * dt;
+                    if (f.slidePos > 2.2) {
+                        isRunning = false;
+                        updatePlayButtonUI();
+                    }
+                    graphHistory.push({ t: simTime, v: f.slideVel });
+                }
+            } else if (currentLab === 'newton') {
+                const nw = state.newton;
+                simTime += dt;
+                if (nw.law === 1) {
+                    if (!nw.crashed) {
+                        nw.cartX += nw.n1V0 * dt * 0.45;
+                        if (nw.cartX >= 3.2) {
+                            nw.cartX = 3.2;
+                            nw.crashed = true;
+                        }
+                    } else {
+                        const aDecel = nw.n1Mu * 9.8;
+                        nw.boxVel = Math.max(0, nw.boxVel - aDecel * dt);
+                        nw.boxOffset += nw.boxVel * dt * 0.45;
+                        if (nw.boxVel === 0 || nw.boxOffset > 2.2) {
+                            isRunning = false;
+                            updatePlayButtonUI();
+                        }
+                    }
+                    graphHistory.push({ t: simTime, v1: nw.crashed ? 0 : nw.n1V0, v2: nw.boxVel });
+                } else if (nw.law === 2) {
+                    const a = Math.max(0, (nw.n2F - nw.n2Mu * nw.n2M * 9.8) / nw.n2M);
+                    nw.n2Vel += a * dt;
+                    nw.n2Pos += nw.n2Vel * dt * 0.35;
+                    if (nw.n2Pos >= 3.0) {
+                        isRunning = false;
+                        updatePlayButtonUI();
+                    }
+                    graphHistory.push({ t: simTime, v1: nw.n2Vel, v2: a });
+                } else if (nw.law === 3) {
+                    if (!nw.n3Released) {
+                        nw.n3Released = true;
+                        const impulse = nw.n3F * 0.35;
+                        nw.n3V1 = -impulse / nw.n3M1;
+                        nw.n3V2 = impulse / nw.n3M2;
+                    }
+                    nw.n3X1 += nw.n3V1 * dt * 0.5;
+                    nw.n3X2 += nw.n3V2 * dt * 0.5;
+                    if (Math.abs(nw.n3X1) > 2.6 || Math.abs(nw.n3X2) > 2.6) {
+                        isRunning = false;
+                        updatePlayButtonUI();
+                    }
+                    graphHistory.push({ t: simTime, v1: Math.abs(nw.n3V1), v2: Math.abs(nw.n3V2) });
+                }
+            } else if (currentLab === 'moment') {
+                const mo = state.moment;
+                simTime += dt;
+                const M1 = mo.m1 * 9.8 * mo.d1;
+                const M2 = mo.m2 * 9.8 * mo.d2;
+                const targetAngle = Math.max(-0.35, Math.min(0.35, (M2 - M1) * 0.8));
+                mo.tiltAngle += (targetAngle - mo.tiltAngle) * 5 * dt;
+                graphHistory.push({ t: simTime, m1: M1, m2: M2 });
+            } else if (currentLab === 'momentum') {
+                const co = state.momentum;
+                simTime += dt;
+                co.x1 += co.curV1 * dt * 0.55;
+                co.x2 += co.curV2 * dt * 0.55;
+
+                if (!co.collided && co.x2 - co.x1 <= 0.65) {
+                    co.collided = true;
+                    if (co.type === 'elastic') {
+                        const v1New = ((co.m1 - co.m2) * co.v1 + 2 * co.m2 * co.v2) / (co.m1 + co.m2);
+                        const v2New = ((co.m2 - co.m1) * co.v2 + 2 * co.m1 * co.v1) / (co.m1 + co.m2);
+                        co.curV1 = v1New;
+                        co.curV2 = v2New;
+                    } else {
+                        const vCommon = (co.m1 * co.v1 + co.m2 * co.v2) / (co.m1 + co.m2);
+                        co.curV1 = vCommon;
+                        co.curV2 = vCommon;
+                    }
+                }
+                if (Math.abs(co.x1) > 3.2 || Math.abs(co.x2) > 3.2) {
+                    isRunning = false;
+                    updatePlayButtonUI();
+                }
+                graphHistory.push({
+                    t: simTime,
+                    p1: co.m1 * co.curV1,
+                    p2: co.m2 * co.curV2,
+                    pSum: co.m1 * co.curV1 + co.m2 * co.curV2
+                });
+            } else if (currentLab === 'circular_hooke') {
+                const ch = state.circular_hooke;
+                simTime += dt;
+                if (ch.mode === 'circular') {
+                    ch.theta += ch.w * dt;
+                    graphHistory.push({ t: simTime, y: ch.r * Math.sin(ch.theta) });
+                } else {
+                    const eqY = (ch.hkM * 9.8) / ch.k;
+                    const acc = (ch.hkM * 9.8 - ch.k * ch.curY) / ch.hkM - 1.8 * ch.vy;
+                    ch.vy += acc * dt;
+                    ch.curY += ch.vy * dt;
+                    graphHistory.push({ t: simTime, y: ch.curY * 100 });
+                }
+            } else if (currentLab === 'pendulum_circuit') {
+                const pc = state.pendulum_circuit;
+                simTime += dt;
+                if (pc.mode === 'pendulum') {
+                    const alphaAcc = -(pc.g / pc.l) * Math.sin(pc.theta);
+                    pc.omega += alphaAcc * dt;
+                    pc.theta += pc.omega * dt;
+                    graphHistory.push({ t: simTime, a: pc.theta * 180 / Math.PI });
+                } else {
+                    const Rn = pc.rb + pc.rLamp;
+                    const I = pc.switchK ? pc.emf / (Rn + pc.r) : 0;
+                    pc.electronPhase += I * dt * 40;
+                    graphHistory.push({ t: simTime, i: I });
+                }
+            }
+
+            document.getElementById('digital-timer').textContent = `${simTime.toFixed(2)} s`;
+        }
+
+        function drawArrow(ctx, x1, y1, x2, y2, color, label) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const len = Math.hypot(dx, dy);
+            if (len < 4) return;
+            const angle = Math.atan2(dy, dx);
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - 9 * Math.cos(angle - 0.35), y2 - 9 * Math.sin(angle - 0.35));
+            ctx.lineTo(x2 - 9 * Math.cos(angle + 0.35), y2 - 9 * Math.sin(angle + 0.35));
+            ctx.closePath();
+            ctx.fill();
+
+            if (label) {
+                ctx.font = 'bold 12px Inter';
+                ctx.fillText(label, x2 + 8 * Math.cos(angle), y2 + 8 * Math.sin(angle));
+            }
+            ctx.restore();
+        }
+
+        function drawSim() {
+            const w = simCanvas.width;
+            const h = simCanvas.height;
+            simCtx.clearRect(0, 0, w, h);
+
+            // Lưới nền phòng thí nghiệm
+            simCtx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
+            simCtx.lineWidth = 1;
+            for (let gx = 0; gx < w; gx += 30) {
+                simCtx.beginPath(); simCtx.moveTo(gx, 0); simCtx.lineTo(gx, h); simCtx.stroke();
+            }
+            for (let gy = 0; gy < h; gy += 30) {
+                simCtx.beginPath(); simCtx.moveTo(0, gy); simCtx.lineTo(w, gy); simCtx.stroke();
+            }
+
+            if (currentLab === 'speed') {
+                const s = state.speed;
+                const rad = s.angle * Math.PI / 180;
+                const startX = 90;
+                const startY = 85;
+                const trackLen = Math.min(w - 180, 480);
+                const endX = startX + trackLen * Math.cos(rad);
+                const endY = startY + trackLen * Math.sin(rad);
+
+                // Giá đỡ & máng nghiêng
+                simCtx.strokeStyle = '#64748b';
+                simCtx.lineWidth = 4;
+                simCtx.beginPath();
+                simCtx.moveTo(startX, startY);
+                simCtx.lineTo(startX, endY);
+                simCtx.lineTo(endX, endY);
+                simCtx.stroke();
+
+                simCtx.strokeStyle = '#38bdf8';
+                simCtx.lineWidth = 6;
+                simCtx.beginPath();
+                simCtx.moveTo(startX, startY);
+                simCtx.lineTo(endX, endY);
+                simCtx.stroke();
+
+                // Cổng quang A & B
+                [ { pos: s.xA, label: 'Cổng A', color: '#f59e0b' }, { pos: s.xB, label: 'Cổng B', color: '#10b981' } ].forEach(gate => {
+                    const ratio = gate.pos / 1.2;
+                    const gx = startX + ratio * trackLen * Math.cos(rad);
+                    const gy = startY + ratio * trackLen * Math.sin(rad);
+                    simCtx.fillStyle = gate.color;
+                    simCtx.beginPath();
+                    simCtx.arc(gx, gy - 12, 7, 0, Math.PI * 2);
+                    simCtx.fill();
+                    simCtx.font = 'bold 11px Inter';
+                    simCtx.fillText(gate.label, gx - 16, gy - 24);
+                });
+
+                // Viên bi thép
+                const ballRatio = Math.min(s.pos / 1.2, 1);
+                const bx = startX + ballRatio * trackLen * Math.cos(rad);
+                const by = startY + ballRatio * trackLen * Math.sin(rad) - 10;
+                simCtx.fillStyle = '#e2e8f0';
+                simCtx.beginPath();
+                simCtx.arc(bx, by, 10, 0, Math.PI * 2);
+                simCtx.fill();
+
+                document.getElementById('live-readout-badges').innerHTML = `
+                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">x = <b>${s.pos.toFixed(2)}m</b></span>
+                    <span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700">v = <b>${s.vel.toFixed(2)}m/s</b></span>
+                `;
+            } else if (currentLab === 'projectile') {
+                drawProjectileSim(w, h);
+            } else if (currentLab === 'forces') {
+                drawForcesSim(w, h);
+            } else if (currentLab === 'newton') {
+                drawNewtonSim(w, h);
+            } else if (currentLab === 'moment') {
+                drawMomentSim(w, h);
+            } else if (currentLab === 'momentum') {
+                drawMomentumSim(w, h);
+            } else if (currentLab === 'circular_hooke') {
+                drawCircularHookeSim(w, h);
+            } else if (currentLab === 'pendulum_circuit') {
+                drawPendulumCircuitSim(w, h);
+            }
+        }
+
+        function drawProjectileSim(w, h) {
+            const p = state.projectile;
+            if (p.mode === 'newton_tube') {
+                const cx = w / 2;
+                const topY = 48;
+                const bottomY = h - 42;
+                const tubeW = 140;
+                const tubeH = bottomY - topY;
+
+                simCtx.strokeStyle = '#64748b';
+                simCtx.fillStyle = '#94a3b8';
+                simCtx.font = '11px JetBrains Mono';
+                simCtx.textAlign = 'right';
+                for (let i = 0; i <= 5; i++) {
+                    const ratio = i / 5;
+                    const yPos = bottomY - ratio * (tubeH - 36);
+                    simCtx.beginPath();
+                    simCtx.moveTo(cx - tubeW / 2 - 14, yPos);
+                    simCtx.lineTo(cx - tubeW / 2 - 6, yPos);
+                    simCtx.stroke();
+                    simCtx.fillText(`${(ratio * p.tubeH).toFixed(1)}m`, cx - tubeW / 2 - 18, yPos + 4);
+                }
+
+                simCtx.fillStyle = p.vacuum ? 'rgba(15, 23, 42, 0.7)' : 'rgba(56, 189, 248, 0.14)';
+                simCtx.strokeStyle = '#94a3b8';
+                simCtx.lineWidth = 3;
+                simCtx.beginPath();
+                simCtx.roundRect(cx - tubeW / 2, topY, tubeW, tubeH, 16);
+                simCtx.fill();
+                simCtx.stroke();
+
+                if (!p.vacuum) {
+                    simCtx.fillStyle = 'rgba(186, 230, 253, 0.35)';
+                    for (let i = 0; i < 28; i++) {
+                        const gx = cx - tubeW / 2 + 16 + ((i * 37) % (tubeW - 32));
+                        const gy = topY + 24 + ((i * 53) % (tubeH - 48));
+                        simCtx.beginPath();
+                        simCtx.arc(gx, gy, 2, 0, Math.PI * 2);
+                        simCtx.fill();
+                    }
+                }
+
+                simCtx.fillStyle = '#475569';
+                simCtx.fillRect(cx - tubeW / 2 + 8, topY - 6, tubeW - 16, 12);
+                simCtx.fillRect(cx - tubeW / 2 + 8, bottomY - 6, tubeW - 16, 14);
+                simCtx.fillStyle = p.vacuum ? '#10b981' : '#f59e0b';
+                simCtx.fillRect(cx + tubeW / 2, bottomY - 22, 24, 10);
+                simCtx.font = 'bold 11px Inter';
+                simCtx.textAlign = 'left';
+                simCtx.fillText(p.vacuum ? 'Van chân không: ĐÓNG (0 atm)' : 'Van không khí: MỞ (1 atm)', cx + tubeW / 2 + 30, bottomY - 13);
+
+                const dropTravelPx = tubeH - 40;
+                const ballY = bottomY - 18 - (p.ballY / p.tubeH) * dropTravelPx;
+                const featherY = bottomY - 18 - (p.featherY / p.tubeH) * dropTravelPx;
+                const ballX = cx - 32;
+                const featherX = cx + 32;
+
+                const grad = simCtx.createRadialGradient(ballX - 3, ballY - 3, 2, ballX, ballY, 11);
+                grad.addColorStop(0, '#cbd5e1');
+                grad.addColorStop(1, '#334155');
+                simCtx.fillStyle = grad;
+                simCtx.beginPath();
+                simCtx.arc(ballX, ballY, 11, 0, Math.PI * 2);
+                simCtx.fill();
+                simCtx.strokeStyle = '#ffffff';
+                simCtx.lineWidth = 1.5;
+                simCtx.stroke();
+                simCtx.fillStyle = '#e2e8f0';
+                simCtx.font = 'bold 11px Inter';
+                simCtx.textAlign = 'center';
+                simCtx.fillText('Bi chì', ballX, topY - 14);
+
+                const sway = (!p.vacuum && !p.featherLanded && isRunning) ? Math.sin(simTime * 9) * 6 : 0;
+                simCtx.save();
+                simCtx.translate(featherX + sway, featherY);
+                simCtx.rotate(-0.35);
+                simCtx.fillStyle = '#fde047';
+                simCtx.beginPath();
+                simCtx.ellipse(0, 0, 16, 6, 0, 0, Math.PI * 2);
+                simCtx.fill();
+                simCtx.strokeStyle = '#ca8a04';
+                simCtx.lineWidth = 1.5;
+                simCtx.beginPath();
+                simCtx.moveTo(-18, 0);
+                simCtx.lineTo(16, 0);
+                simCtx.stroke();
+                simCtx.restore();
+                simCtx.fillStyle = '#fde047';
+                simCtx.fillText('Lông chim', featherX, topY - 14);
+
+                document.getElementById('live-readout-badges').innerHTML = `
+                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">v_bi = <b>${p.ballV.toFixed(2)}m/s</b></span>
+                    <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">v_lông = <b>${p.featherV.toFixed(2)}m/s</b></span>
+                `;
+                return;
+            }
+
+            const marginLeft = 65;
+            const marginBottom = 45;
+            const groundY = h - marginBottom;
+            const maxH = Math.max(85, p.maxY * 1.15);
+            const maxX = Math.max(120, p.x * 1.15);
+            const scaleY = (groundY - 35) / maxH;
+            const scaleX = (w - marginLeft - 40) / maxX;
+
+            // Mặt đất
+            simCtx.fillStyle = '#1e293b';
+            simCtx.fillRect(0, groundY, w, marginBottom);
+            simCtx.strokeStyle = '#10b981';
+            simCtx.lineWidth = 2;
+            simCtx.beginPath();
+            simCtx.moveTo(0, groundY);
+            simCtx.lineTo(w, groundY);
+            simCtx.stroke();
+
+            // Bệ phóng độ cao h
+            const launchY = groundY - p.h * scaleY;
+            simCtx.fillStyle = '#475569';
+            simCtx.fillRect(marginLeft - 24, launchY, 24, p.h * scaleY);
+
+            // Vạch độ cao cực đại H_max
+            const hMaxPxY = groundY - p.maxY * scaleY;
+            simCtx.strokeStyle = 'rgba(250, 204, 21, 0.7)';
+            simCtx.setLineDash([5, 4]);
+            simCtx.beginPath();
+            simCtx.moveTo(marginLeft, hMaxPxY);
+            simCtx.lineTo(w - 30, hMaxPxY);
+            simCtx.stroke();
+            simCtx.setLineDash([]);
+            simCtx.fillStyle = '#fde047';
+            simCtx.font = 'bold 11px JetBrains Mono';
+            simCtx.textAlign = 'left';
+            simCtx.fillText(`H_max = ${p.maxY.toFixed(2)} m`, marginLeft + 8, hMaxPxY - 6);
+
+            // Quỹ đạo parabol
+            if (p.trail.length > 1) {
+                simCtx.strokeStyle = '#38bdf8';
+                simCtx.lineWidth = 2.5;
+                simCtx.beginPath();
+                p.trail.forEach((pt, idx) => {
+                    const px = marginLeft + pt.x * scaleX;
+                    const py = groundY - pt.y * scaleY;
+                    if (idx === 0) simCtx.moveTo(px, py);
+                    else simCtx.lineTo(px, py);
+                });
+                simCtx.stroke();
+            }
+
+            // Vật chuyển động
+            const ballX = marginLeft + p.x * scaleX;
+            const ballY = groundY - p.y * scaleY;
+            simCtx.fillStyle = '#f43f5e';
+            simCtx.beginPath();
+            simCtx.arc(ballX, ballY, 8, 0, Math.PI * 2);
+            simCtx.fill();
+
+            if (document.getElementById('inp-proj-vectors').checked) {
+                drawArrow(simCtx, ballX, ballY, ballX + p.vx * 2.5, ballY, '#22c55e', 'vₓ');
+                drawArrow(simCtx, ballX, ballY, ballX, ballY - p.vy * 2.5, '#f59e0b', 'vᵧ');
+                drawArrow(simCtx, ballX, ballY, ballX + p.vx * 2.5, ballY - p.vy * 2.5, '#38bdf8', 'v');
+            }
+
+            document.getElementById('live-readout-badges').innerHTML = `
+                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">x = <b>${p.x.toFixed(1)}m</b></span>
+                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">y = <b>${p.y.toFixed(1)}m</b></span>
+                <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700">H_max = <b>${p.maxY.toFixed(1)}m</b></span>
+            `;
+        }
+
+        function drawForcesSim(w, h) {
+            const f = state.forces;
+            if (f.mode === 'compose') {
+                const cx = w / 2;
+                const cy = h / 2 + 15;
+                const scale = 2.0;
+
+                // Thước đo góc tròn
+                simCtx.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+                simCtx.lineWidth = 1.5;
+                simCtx.beginPath();
+                simCtx.arc(cx, cy, 125, 0, Math.PI * 2);
+                simCtx.stroke();
+
+                const a1 = f.angle1;
+                const a2 = a1 - f.alpha * Math.PI / 180;
+                const x1 = cx + f.f1 * scale * Math.cos(a1);
+                const y1 = cy + f.f1 * scale * Math.sin(a1);
+                const x2 = cx + f.f2 * scale * Math.cos(a2);
+                const y2 = cy + f.f2 * scale * Math.sin(a2);
+                const xSum = x1 + (x2 - cx);
+                const ySum = y1 + (y2 - cy);
+
+                // Hình bình hành nét đứt
+                simCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+                simCtx.setLineDash([4, 4]);
+                simCtx.beginPath();
+                simCtx.moveTo(x1, y1); simCtx.lineTo(xSum, ySum);
+                simCtx.moveTo(x2, y2); simCtx.lineTo(xSum, ySum);
+                simCtx.stroke();
+                simCtx.setLineDash([]);
+
+                drawArrow(simCtx, cx, cy, x1, y1, '#3b82f6', `F₁=${f.f1}N`);
+                drawArrow(simCtx, cx, cy, x2, y2, '#10b981', `F₂=${f.f2}N`);
+                drawArrow(simCtx, cx, cy, xSum, ySum, '#f43f5e', 'F');
+                drawArrow(simCtx, cx, cy, 2 * cx - xSum, 2 * cy - ySum, '#f59e0b', 'F₃ (Cân bằng)');
+
+                simCtx.fillStyle = '#ffffff';
+                simCtx.beginPath(); simCtx.arc(cx, cy, 5, 0, Math.PI * 2); simCtx.fill();
+            } else {
+                const rad = f.incAlpha * Math.PI / 180;
+                const baseX = 120;
+                const baseY = h - 55;
+                const slopeLen = 360;
+                const topX = baseX;
+                const topY = baseY - slopeLen * Math.sin(rad);
+                const rightX = baseX + slopeLen * Math.cos(rad);
+
+                simCtx.fillStyle = '#334155';
+                simCtx.beginPath();
+                simCtx.moveTo(topX, topY);
+                simCtx.lineTo(baseX, baseY);
+                simCtx.lineTo(rightX, baseY);
+                simCtx.closePath();
+                simCtx.fill();
+
+                const distPx = 60 + f.slidePos * 110;
+                const bx = topX + distPx * Math.cos(rad) + 18 * Math.sin(rad);
+                const by = topY + distPx * Math.sin(rad) - 18 * Math.cos(rad);
+
+                simCtx.save();
+                simCtx.translate(bx, by);
+                simCtx.rotate(rad);
+                simCtx.fillStyle = '#3b82f6';
+                simCtx.fillRect(-20, -18, 40, 36);
+                simCtx.restore();
+
+                const P = f.incM * 9.8 * 1.4;
+                drawArrow(simCtx, bx, by, bx, by + P, '#f59e0b', 'P');
+                drawArrow(simCtx, bx, by, bx + P * Math.sin(rad) * Math.cos(rad), by + P * Math.sin(rad) * Math.sin(rad), '#f43f5e', 'Pₓ');
+                drawArrow(simCtx, bx, by, bx + P * Math.cos(rad) * Math.sin(rad), by - P * Math.cos(rad) * Math.cos(rad), '#22d3ee', 'N');
+            }
+        }
+
+        function drawNewtonSim(w, h) {
+            const nw = state.newton;
+            const groundY = h - 65;
+            simCtx.fillStyle = '#334155';
+            simCtx.fillRect(0, groundY, w, 65);
+
+            if (nw.law === 1) {
+                const cx = 60 + nw.cartX * 130;
+                // Xe lăn
+                simCtx.fillStyle = '#3b82f6';
+                simCtx.fillRect(cx, groundY - 35, 90, 25);
+                // Vật cản cố định
+                simCtx.fillStyle = '#f43f5e';
+                simCtx.fillRect(60 + 3.2 * 130 + 90, groundY - 60, 22, 60);
+                // Khối hàng
+                const bx = cx + 25 + nw.boxOffset * 130;
+                simCtx.fillStyle = '#f59e0b';
+                simCtx.fillRect(bx, groundY - 65, 36, 30);
+            } else if (nw.law === 2) {
+                const cx = 80 + nw.n2Pos * 120;
+                simCtx.fillStyle = '#3b82f6';
+                simCtx.fillRect(cx, groundY - 36, 80, 26);
+                drawArrow(simCtx, cx + 80, groundY - 23, cx + 130, groundY - 23, '#10b981', `F=${nw.n2F}N`);
+            } else {
+                const mid = w / 2;
+                const x1 = mid + nw.n3X1 * 110 - 50;
+                const x2 = mid + nw.n3X2 * 110;
+                simCtx.fillStyle = '#3b82f6';
+                simCtx.fillRect(x1, groundY - 36, 50, 26);
+                simCtx.fillStyle = '#10b981';
+                simCtx.fillRect(x2, groundY - 36, 50, 26);
+                drawArrow(simCtx, x1, groundY - 23, x1 - 45, groundY - 23, '#f43f5e', 'F₂₁');
+                drawArrow(simCtx, x2 + 50, groundY - 23, x2 + 95, groundY - 23, '#f43f5e', 'F₁₂');
+            }
+        }
+
+        function drawMomentSim(w, h) {
+            const mo = state.moment;
+            const cx = w / 2;
+            const cy = h / 2;
+            simCtx.fillStyle = '#64748b';
+            simCtx.beginPath();
+            simCtx.moveTo(cx, cy); simCtx.lineTo(cx - 25, h - 40); simCtx.lineTo(cx + 25, h - 40);
+            simCtx.closePath();
+            simCtx.fill();
+
+            simCtx.save();
+            simCtx.translate(cx, cy);
+            simCtx.rotate(mo.tiltAngle);
+            simCtx.fillStyle = '#cbd5e1';
+            simCtx.fillRect(-240, -6, 480, 12);
+
+            const px1 = -mo.d1 * 700;
+            const px2 = mo.d2 * 700;
+            simCtx.fillStyle = '#3b82f6';
+            simCtx.fillRect(px1 - 15, 6, 30, 20 + mo.m1 * 50);
+            simCtx.fillStyle = '#10b981';
+            simCtx.fillRect(px2 - 15, 6, 30, 20 + mo.m2 * 50);
+            simCtx.restore();
+        }
+
+        function drawMomentumSim(w, h) {
+            const co = state.momentum;
+            const groundY = h - 75;
+            const mid = w / 2;
+            simCtx.fillStyle = '#334155';
+            simCtx.fillRect(0, groundY, w, 75);
+
+            const px1 = mid + co.x1 * 90;
+            const px2 = mid + co.x2 * 90;
+            simCtx.fillStyle = '#3b82f6';
+            simCtx.fillRect(px1 - 28, groundY - 40, 56, 40);
+            simCtx.fillStyle = '#10b981';
+            simCtx.fillRect(px2 - 28, groundY - 40, 56, 40);
+            drawArrow(simCtx, px1, groundY - 52, px1 + co.curV1 * 14, groundY - 52, '#38bdf8', `v₁=${co.curV1.toFixed(1)}`);
+            drawArrow(simCtx, px2, groundY - 52, px2 + co.curV2 * 14, groundY - 52, '#34d399', `v₂=${co.curV2.toFixed(1)}`);
+        }
+
+        function drawCircularHookeSim(w, h) {
+            const ch = state.circular_hooke;
+            const cx = w / 2;
+            const cy = h / 2;
+            if (ch.mode === 'circular') {
+                const radPx = ch.r * 130;
+                simCtx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+                simCtx.setLineDash([4, 4]);
+                simCtx.beginPath(); simCtx.arc(cx, cy, radPx, 0, Math.PI * 2); simCtx.stroke();
+                simCtx.setLineDash([]);
+
+                const bx = cx + radPx * Math.cos(ch.theta);
+                const by = cy + radPx * Math.sin(ch.theta);
+                simCtx.strokeStyle = '#94a3b8';
+                simCtx.beginPath(); simCtx.moveTo(cx, cy); simCtx.lineTo(bx, by); simCtx.stroke();
+
+                simCtx.fillStyle = '#f43f5e';
+                simCtx.beginPath(); simCtx.arc(bx, by, 10, 0, Math.PI * 2); simCtx.fill();
+
+                drawArrow(simCtx, bx, by, bx - 45 * Math.sin(ch.theta), by + 45 * Math.cos(ch.theta), '#22c55e', 'v');
+                drawArrow(simCtx, bx, by, bx - 45 * Math.cos(ch.theta), by - 45 * Math.sin(ch.theta), '#f59e0b', 'F_ht');
+            } else {
+                const topY = 40;
+                const dl = isRunning ? ch.curY : (ch.hkM * 9.8) / ch.k;
+                const lenPx = (ch.l0 + dl) * 420;
+                simCtx.fillStyle = '#64748b';
+                simCtx.fillRect(cx - 50, topY - 10, 100, 10);
+
+                // Vẽ lò xo xoắn
+                simCtx.strokeStyle = '#38bdf8';
+                simCtx.lineWidth = 2.5;
+                simCtx.beginPath();
+                const coils = 14;
+                for (let i = 0; i <= coils; i++) {
+                    const y = topY + (i / coils) * lenPx;
+                    const x = cx + (i === 0 || i === coils ? 0 : (i % 2 === 0 ? 14 : -14));
+                    if (i === 0) simCtx.moveTo(x, y); else simCtx.lineTo(x, y);
+                }
+                simCtx.stroke();
+
+                simCtx.fillStyle = '#f59e0b';
+                simCtx.fillRect(cx - 22, topY + lenPx, 44, 34);
+            }
+        }
+
+        function drawPendulumCircuitSim(w, h) {
+            const pc = state.pendulum_circuit;
+            const cx = w / 2;
+            if (pc.mode === 'pendulum') {
+                const topY = 45;
+                const lenPx = pc.l * 115;
+                const bx = cx + lenPx * Math.sin(pc.theta);
+                const by = topY + lenPx * Math.cos(pc.theta);
+                simCtx.fillStyle = '#64748b';
+                simCtx.fillRect(cx - 40, topY - 8, 80, 8);
+                simCtx.strokeStyle = '#cbd5e1';
+                simCtx.lineWidth = 2;
+                simCtx.beginPath(); simCtx.moveTo(cx, topY); simCtx.lineTo(bx, by); simCtx.stroke();
+                simCtx.fillStyle = '#3b82f6';
+                simCtx.beginPath(); simCtx.arc(bx, by, 14, 0, Math.PI * 2); simCtx.fill();
+            } else {
+                const left = cx - 160, right = cx + 160, top = 70, bot = h - 70;
+                simCtx.strokeStyle = '#94a3b8';
+                simCtx.lineWidth = 3;
+                simCtx.strokeRect(left, top, right - left, bot - top);
+
+                // Nguồn điện
+                simCtx.fillStyle = '#0f172a';
+                simCtx.fillRect(left - 15, (top + bot) / 2 - 20, 30, 40);
+                simCtx.fillStyle = '#38bdf8';
+                simCtx.font = 'bold 12px Inter';
+                simCtx.fillText(`ξ=${pc.emf}V`, left - 55, (top + bot) / 2 + 4);
+
+                // Bóng đèn
+                const Rn = pc.rb + pc.rLamp;
+                const I = pc.switchK ? pc.emf / (Rn + pc.r) : 0;
+                simCtx.fillStyle = I > 0 ? `rgba(250, 204, 21, ${Math.min(1, I / 2)})` : '#334155';
+                simCtx.beginPath(); simCtx.arc(right, (top + bot) / 2, 18, 0, Math.PI * 2); simCtx.fill();
+                simCtx.strokeStyle = '#fde047'; simCtx.stroke();
+            }
+        }
+
+        function drawGraph() {
+            const w = graphCanvas.width;
+            const h = graphCanvas.height;
+            graphCtx.clearRect(0, 0, w, h);
+
+            const padL = 45, padR = 16, padT = 14, padB = 26;
+            const plotW = w - padL - padR;
+            const plotH = h - padT - padB;
+
+            graphCtx.strokeStyle = '#cbd5e1';
+            graphCtx.lineWidth = 1.5;
+            graphCtx.beginPath();
+            graphCtx.moveTo(padL, padT);
+            graphCtx.lineTo(padL, h - padB);
+            graphCtx.lineTo(w - padR, h - padB);
+            graphCtx.stroke();
+
+            graphCtx.fillStyle = '#64748b';
+            graphCtx.font = '11px Inter';
+            graphCtx.textAlign = 'center';
+
+            if (currentLab === 'projectile') {
+                const p = state.projectile;
+                if (p.mode === 'newton_tube') {
+                    graphCtx.fillText('Thời gian t (s)', padL + plotW / 2, h - 8);
+                    if (graphHistory.length < 2) return;
+                    const maxT = Math.max(1.5, graphHistory[graphHistory.length - 1].t);
+                    const maxV = 12;
+
+                    graphCtx.strokeStyle = '#2563eb';
+                    graphCtx.lineWidth = 2.2;
+                    graphCtx.beginPath();
+                    graphHistory.forEach((pt, idx) => {
+                        const x = padL + (pt.t / maxT) * plotW;
+                        const y = (h - padB) - Math.min(pt.v1 / maxV, 1) * plotH;
+                        if (idx === 0) graphCtx.moveTo(x, y); else graphCtx.lineTo(x, y);
+                    });
+                    graphCtx.stroke();
+
+                    graphCtx.strokeStyle = '#d97706';
+                    graphCtx.lineWidth = 2.2;
+                    graphCtx.setLineDash([5, 4]);
+                    graphCtx.beginPath();
+                    graphHistory.forEach((pt, idx) => {
+                        const x = padL + (pt.t / maxT) * plotW;
+                        const y = (h - padB) - Math.min(pt.v2 / maxV, 1) * plotH;
+                        if (idx === 0) graphCtx.moveTo(x, y); else graphCtx.lineTo(x, y);
+                    });
+                    graphCtx.stroke();
+                    graphCtx.setLineDash([]);
+                    return;
+                }
+
+                graphCtx.fillText('Thời gian t (s)', padL + plotW / 2, h - 8);
+                if (graphHistory.length < 2) return;
+                const maxT = Math.max(2, graphHistory[graphHistory.length - 1].t);
+                const maxV = Math.max(30, ...graphHistory.map(g => g.v));
+
+                graphCtx.strokeStyle = '#2563eb';
+                graphCtx.lineWidth = 2;
+                graphCtx.beginPath();
+                graphHistory.forEach((pt, idx) => {
+                    const x = padL + (pt.t / maxT) * plotW;
+                    const y = (h - padB) - (pt.v / maxV) * plotH;
+                    if (idx === 0) graphCtx.moveTo(x, y); else graphCtx.lineTo(x, y);
+                });
+                graphCtx.stroke();
+                return;
+            }
+
+            graphCtx.fillText('Thời gian t (s)', padL + plotW / 2, h - 8);
+            if (graphHistory.length < 2) return;
+            const maxT = Math.max(2, graphHistory[graphHistory.length - 1].t);
+
+            graphCtx.strokeStyle = '#2563eb';
+            graphCtx.lineWidth = 2;
+            graphCtx.beginPath();
+            graphHistory.forEach((pt, idx) => {
+                const val = pt.v ?? pt.v1 ?? pt.m1 ?? pt.p1 ?? pt.y ?? pt.a ?? pt.i ?? 0;
+                const x = padL + (pt.t / maxT) * plotW;
+                const y = (h - padB) - Math.min(Math.abs(val) / 20, 1) * plotH;
+                if (idx === 0) graphCtx.moveTo(x, y); else graphCtx.lineTo(x, y);
+            });
+            graphCtx.stroke();
+        }
+
+        function recordData() {
+            const list = recordedData[currentLab];
+            const index = list.length + 1;
+
+            if (currentLab === 'speed') {
+                const s = state.speed;
+                const vB = s.tB > 0 ? (s.d / s.tB).toFixed(2) : '0.00';
+                list.push({ stt: index, angle: `${s.angle}°`, dx: `${(s.xB - s.xA).toFixed(2)} m`, tAB: `${s.tAB.toFixed(3)} s`, tB: `${s.tB.toFixed(3)} s`, vB: `${vB} m/s` });
+            } else if (currentLab === 'projectile') {
+                const p = state.projectile;
+                if (p.mode === 'newton_tube') {
+                    list.push({
+                        stt: index,
+                        h: `${p.tubeH.toFixed(1)} m`,
+                        v0: `${p.vacuum ? 'Chân không' : 'Không khí'} (g=${p.tubeG})`,
+                        drag: p.vacuum ? 'Không' : 'Có',
+                        t: `bi:${p.ballTime.toFixed(2)}s / lông:${p.featherTime.toFixed(2)}s`,
+                        hMax: `${p.tubeH.toFixed(2)} m`,
+                        x: '0.00 m',
+                        v: `bi:${p.ballV.toFixed(2)} / lông:${p.featherV.toFixed(2)}`
+                    });
+                } else {
+                    list.push({
+                        stt: index,
+                        h: `${p.h.toFixed(1)} m`,
+                        v0: `${p.v0.toFixed(1)} m/s (${p.angle}°)`,
+                        drag: p.drag ? 'Có' : 'Không',
+                        t: `${simTime.toFixed(2)} s`,
+                        hMax: `${p.maxY.toFixed(2)} m`,
+                        x: `${p.x.toFixed(2)} m`,
+                        v: `${Math.hypot(p.vx, p.vy).toFixed(2)} m/s`
+                    });
+                }
+            } else {
+                list.push({ stt: index, lab: labMeta[currentLab].title, time: `${simTime.toFixed(2)} s`, note: 'Đạt trạng thái khảo sát' });
+            }
+
+            renderTable();
+            showToast('Đã ghi số liệu vào bảng báo cáo!');
+        }
+
+        function renderTable() {
+            const head = document.getElementById('data-table-head');
+            const body = document.getElementById('data-table-body');
+            const list = recordedData[currentLab];
+
+            if (currentLab === 'speed') {
+                head.innerHTML = `<tr><th class="p-2.5">Lần đo</th><th class="p-2.5">Góc α</th><th class="p-2.5">Quãng đường AB</th><th class="p-2.5">t_AB</th><th class="p-2.5">Δt_B</th><th class="p-2.5">Tốc độ tức thời v_B</th></tr>`;
+                body.innerHTML = list.length ? list.map(r => `<tr><td class="p-2.5">${r.stt}</td><td class="p-2.5">${r.angle}</td><td class="p-2.5">${r.dx}</td><td class="p-2.5">${r.tAB}</td><td class="p-2.5">${r.tB}</td><td class="p-2.5 font-bold text-blue-600">${r.vB}</td></tr>`).join('')
+                    : `<tr><td colspan="6" class="p-4 text-center text-slate-400 font-sans">Chưa có dữ liệu đo. Hãy cho bi lăn qua 2 cổng quang và nhấn "+ Ghi số liệu".</td></tr>`;
+            } else if (currentLab === 'projectile') {
+                head.innerHTML = `<tr><th class="p-2.5">Lần đo</th><th class="p-2.5">Độ cao h</th><th class="p-2.5">Chế độ / v₀ (α)</th><th class="p-2.5">Lực cản</th><th class="p-2.5">Thời gian rơi/bay</th><th class="p-2.5">Độ cao cực đại H_max</th><th class="p-2.5">Tầm xa x</th><th class="p-2.5">Vận tốc chạm đất</th></tr>`;
+                body.innerHTML = list.length ? list.map(r => `<tr><td class="p-2.5">${r.stt}</td><td class="p-2.5">${r.h}</td><td class="p-2.5">${r.v0}</td><td class="p-2.5">${r.drag}</td><td class="p-2.5">${r.t}</td><td class="p-2.5 font-bold text-amber-600">${r.hMax}</td><td class="p-2.5">${r.x}</td><td class="p-2.5 font-bold text-blue-600">${r.v}</td></tr>`).join('')
+                    : `<tr><td colspan="8" class="p-4 text-center text-slate-400 font-sans">Chưa có dữ liệu đo. Hãy chạy thí nghiệm và nhấn "+ Ghi số liệu".</td></tr>`;
+            } else {
+                head.innerHTML = `<tr><th class="p-2.5">Lần đo</th><th class="p-2.5">Bài thí nghiệm</th><th class="p-2.5">Thời gian đo</th><th class="p-2.5">Ghi chú kết quả</th></tr>`;
+                body.innerHTML = list.length ? list.map(r => `<tr><td class="p-2.5">${r.stt}</td><td class="p-2.5 font-sans">${r.lab}</td><td class="p-2.5">${r.time}</td><td class="p-2.5 font-sans text-emerald-600 font-semibold">${r.note}</td></tr>`).join('')
+                    : `<tr><td colspan="4" class="p-4 text-center text-slate-400 font-sans">Chưa có dữ liệu đo. Nhấn "+ Ghi số liệu" để lưu kết quả.</td></tr>`;
+            }
+        }
+
+        function clearTableData() {
+            recordedData[currentLab] = [];
+            renderTable();
+            showToast('Đã xóa bảng số liệu!');
+        }
+
+        function copyTableData() {
+            const table = document.getElementById('data-table-body');
+            const range = document.createRange();
+            range.selectNode(table);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            showToast('Đã sao chép bảng số liệu vào bộ nhớ tạm!');
+        }
+
+        function resizeCanvases() {
+            const simBox = document.getElementById('sim-canvas-container');
+            simCanvas.width = simBox.clientWidth;
+            simCanvas.height = simBox.clientHeight;
+
+            const graphBox = document.getElementById('graph-canvas-container');
+            graphCanvas.width = graphBox.clientWidth;
+            graphCanvas.height = graphBox.clientHeight;
+
+            drawSim();
+            drawGraph();
+        }
+
+        // Kéo thả trực tiếp vectơ lực F1, F2 trên Canvas ở Mục 3
+        simCanvas.addEventListener('pointerdown', (e) => {
+            if (currentLab !== 'forces' || state.forces.mode !== 'compose') return;
+            const rect = simCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const cx = simCanvas.width / 2;
+            const cy = simCanvas.height / 2 + 15;
+            const f = state.forces;
+            const scale = 2.0;
+            const x1 = cx + f.f1 * scale * Math.cos(f.angle1);
+            const y1 = cy + f.f1 * scale * Math.sin(f.angle1);
+            const a2 = f.angle1 - f.alpha * Math.PI / 180;
+            const x2 = cx + f.f2 * scale * Math.cos(a2);
+            const y2 = cy + f.f2 * scale * Math.sin(a2);
+
+            if (Math.hypot(mx - x1, my - y1) < 22) f.draggingVec = 'f1';
+            else if (Math.hypot(mx - x2, my - y2) < 22) f.draggingVec = 'f2';
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            const f = state.forces;
+            if (!f.draggingVec) return;
+            const rect = simCanvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const cx = simCanvas.width / 2;
+            const cy = simCanvas.height / 2 + 15;
+            const dx = mx - cx;
+            const dy = my - cy;
+            const mag = Math.min(80, Math.max(10, Math.round(Math.hypot(dx, dy) / 2.0)));
+
+            if (f.draggingVec === 'f1') {
+                f.f1 = mag;
+                document.getElementById('inp-f1').value = mag;
+            } else {
+                f.f2 = mag;
+                document.getElementById('inp-f2').value = mag;
+                let deg = Math.round((-Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360);
+                if (deg > 180) deg = 180;
+                document.getElementById('inp-falpha').value = deg;
+            }
+            updateParams();
+        });
+
+        window.addEventListener('pointerup', () => {
+            state.forces.draggingVec = null;
+        });
+
+        function mainLoop(now) {
+            if (!lastFrameTime) lastFrameTime = now;
+            const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+            lastFrameTime = now;
+
+            if (isRunning) {
+                stepPhysics(dt);
+                drawSim();
+                drawGraph();
+            }
+            requestAnimationFrame(mainLoop);
+        }
+
+        window.addEventListener('resize', resizeCanvases);
+        window.onload = function () {
+            resizeCanvases();
+            switchLab('speed');
+            requestAnimationFrame(mainLoop);
+        };
+    </script>
+</body>
+</html>
